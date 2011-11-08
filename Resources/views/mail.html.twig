@@ -1,0 +1,86 @@
+<h2>{{ exception_class }} : {{ exception.message }}</h2>
+
+<h3>Information:</h3>
+<strong>Generated at: </strong> {{ "now"|date("d-m-Y H:i:s") }} <br />
+<strong>Class name: </strong> {{ exception_class }} <br />
+<strong>Message: </strong> {{ exception.message }} <br />
+<strong>Uri: </strong> {{ request.uri }} <br />
+
+<h3>Stack trace:</h3>
+<pre>
+    {% include "TwigBundle:Exception:exception.txt.twig" with {'exception': exception, 'status_code': status_code, 'status_text': status_text} %}
+</pre>
+
+<h4>Request GET Parameters</h4>
+
+{% if request.query.all|length %}
+    {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': request.query } only %}
+{% else %}
+    <p>
+        <em>No GET parameters</em>
+    </p>
+{% endif %}
+
+<h4>Request POST Parameters</h4>
+
+{% if request.request.all|length %}
+    {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': request.request } only %}
+{% else %}
+    <p>
+        <em>No POST parameters</em>
+    </p>
+{% endif %}
+
+<h4>Request Attributes</h4>
+
+{% if request.attributes.all|length %}
+    {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': request.attributes } only %}
+{% else %}
+    <p>
+        <em>No attributes</em>
+    </p>
+{% endif %}
+
+<h4>Request Cookies</h4>
+
+{% if request.cookies.all|length %}
+    {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': request.cookies } only %}
+{% else %}
+    <p>
+        <em>No cookies</em>
+    </p>
+{% endif %}
+
+<h4>Request Headers</h4>
+
+{% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': request.headers } only %}
+
+<h4>Request Server Parameters</h4>
+
+{% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': request.server } only %}
+
+<h4>Response Headers</h4>
+
+{% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': response.headers } only %}
+
+<h4>Session Attributes</h4>
+
+{% if request.session.attributes|length %}
+    <table>
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+        {% set attributes = request.session.attributes %}
+        {% for key in attributes|keys|sort %}
+            <tr>
+                <th>{{ key }}</th>
+                <td>{{ attributes[key]|yaml_dump }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>
+        <em>No session attributes</em>
+    </p>
+{% endif %}

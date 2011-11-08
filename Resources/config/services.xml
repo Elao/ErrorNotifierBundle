@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="elao.error_notifier.listener.class">Elao\ErrorNotifierBundle\Listener\Notifier</parameter>
+    </parameters>
+
+    <services>
+        <service id="elao.error_notifier.listener" class="%elao.error_notifier.listener.class%">
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException"/>
+            <argument type="service" id="mailer" />
+            <argument type="service" id="templating" />
+            <argument>%elao.error_notifier.from%</argument> <!-- send mail from ? -->
+            <argument>%elao.error_notifier.to%</argument> <!-- send mail to ? -->
+        </service>
+    </services>
+
+</container>
