@@ -7,15 +7,39 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use \Swift_Mailer;
 
+use Symfony\Component\Templating\EngineInterface;
+
+/**
+ * Notifier
+ */
 class Notifier
 {
 
+    /**
+     * @var Swift_Mailer $mailer
+     */
     private $mailer;
+
+    /**
+     * @var EngineInterface $templating
+     */
     private $templating;
+
     private $from;
+
     private $to;
 
-    public function __construct($mailer, $templating, $from, $to)
+    /**
+     * __construct
+     * 
+     * @param Swift_Mailer    $mailer     mailer
+     * @param EngineInterface $templating templating
+     * @param type            $from       from
+     * @param type            $to         to
+     * 
+     * @return void
+     */
+    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to)
     {
         $this->mailer = $mailer;
 
@@ -26,6 +50,13 @@ class Notifier
         $this->to = $to;
     }
 
+    /**
+     * Handle the event
+     * 
+     * @param GetResponseForExceptionEvent $event event
+     * 
+     * @return void
+     */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $e = FlattenException::create($event->getException(), 500, $event->getRequest()->headers->all());

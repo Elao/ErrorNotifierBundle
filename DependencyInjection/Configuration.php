@@ -5,9 +5,17 @@ namespace Elao\ErrorNotifierBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Configuration for ElaoErrorNotifierBundle
+ */
 class Configuration implements ConfigurationInterface
 {
 
+    /**
+     * Get config tree
+     * 
+     * @return TreeBuilder
+     */
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();

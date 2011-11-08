@@ -9,16 +9,24 @@ use Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
+/**
+ * ElaoErrorNotifier Extension
+ */
 class ElaoErrorNotifierExtension extends Extension
 {
 
     /**
-     * {@inheritDoc}
+     * load configuration
+     * 
+     * @param array            $configs   configs
+     * @param ContainerBuilder $container container
+     * 
+     * @return void
      */
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
-        
+
         if (count($configs[0])) {
             $config = $this->processConfiguration($configuration, $configs);
 
