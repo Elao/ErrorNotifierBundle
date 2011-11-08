@@ -12,11 +12,12 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
 
-        $root = $treeBuilder->root('elao_errornotifier');
+        $root = $treeBuilder->root('elao_error_notifier');
 
         $root
             ->children()
                 ->scalarNode('to')->cannotBeEmpty()->end()
+                ->scalarNode('from')->cannotBeEmpty()->end()
             ->end();
 
         return $treeBuilder;

@@ -7,9 +7,18 @@
 <strong>Uri: </strong> {{ request.uri }} <br />
 
 <h3>Stack trace:</h3>
-<pre>
-    {% include "TwigBundle:Exception:exception.txt.twig" with {'exception': exception, 'status_code': status_code, 'status_text': status_text} %}
-</pre>
+{% for trace in exception.trace %}
+    #{{ loop.index0 }} - 
+        {% if trace.class is defined %}
+            {{ trace.class }}{{ trace.type }}{{ trace.function }}()
+        {% else %}
+            {{ trace.function }}()
+        {% endif %} 
+        {% if trace.file is defined %}
+            in {{ trace.file }} line {{ trace.line }}
+        {% endif %}
+    <br />
+{% endfor %}
 
 <h4>Request GET Parameters</h4>
 
@@ -59,19 +68,15 @@
 
 {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': request.server } only %}
 
-<h4>Response Headers</h4>
-
-{% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': response.headers } only %}
-
 <h4>Session Attributes</h4>
 
-{% if request.session.attributes|length %}
+{% if request.session.all|length %}
     <table>
         <tr>
             <th>Key</th>
             <th>Value</th>
         </tr>
-        {% set attributes = request.session.attributes %}
+        {% set attributes = request.session.all %}
         {% for key in attributes|keys|sort %}
             <tr>
                 <th>{{ key }}</th>

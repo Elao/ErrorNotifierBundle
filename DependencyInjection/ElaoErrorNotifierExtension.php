@@ -18,13 +18,15 @@ class ElaoErrorNotifierExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
+        
+        if (count($configs[0])) {
+            $config = $this->processConfiguration($configuration, $configs);
 
-        $config = $this->processConfiguration($configuration, $configs);
+            $container->setParameter('elao.error_notifier.from', $config['from']);
+            $container->setParameter('elao.error_notifier.to', $config['to']);
 
-        $container->setParameter('elao.error_notifier.from', $config['from']);
-        $container->setParameter('elao.error_notifier.to', $config['to']);
-
-        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config/')));
-        $loader->load('services.xml');
+            $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config/')));
+            $loader->load('services.xml');
+        }
     }
 }
