@@ -10,7 +10,7 @@
 
     <services>
         <service id="elao.error_notifier.listener" class="%elao.error_notifier.listener.class%">
-            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException"/>
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-129"/>
             <argument type="service" id="mailer" />
             <argument type="service" id="templating" />
             <argument>%elao.error_notifier.from%</argument> <!-- send mail from ? -->
