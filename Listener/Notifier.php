@@ -59,15 +59,23 @@ class Notifier
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        $e = FlattenException::create($event->getException(), 500, $event->getRequest()->headers->all());
+        $exception = $event->getException();
+
+        // Http Error
+        if ($exception instanceof HttpException) {
+            
+            if ($exception->getStatusCode() == 404) {
+                // we handle 404 Error ?
+            } else if ($exception->getStatusCode() != 500) {
+                // always catch 500
+                return;
+            }
+        }
 
         $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
             'exception' => $e,
-            'exception_class' => $e->getClass(),
+            'exception_class' => getclass($exception),
             'request' => $event->getRequest(),
-            'response' => $event->getResponse(),
-            'status_code' => 500,
-            'status_text' => ''
         ));
 
         $mail = \Swift_Message::newInstance()
@@ -79,5 +87,4 @@ class Notifier
 
         $this->mailer->send($mail);
     }
-
 }
