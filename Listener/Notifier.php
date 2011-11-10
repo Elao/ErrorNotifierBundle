@@ -29,17 +29,20 @@ class Notifier
 
     private $to;
 
+    private $handle404;
+
     /**
      * __construct
      * 
      * @param Swift_Mailer    $mailer     mailer
      * @param EngineInterface $templating templating
-     * @param type            $from       from
-     * @param type            $to         to
+     * @param string          $from       send mail from
+     * @param string          $to         send mail to
+     * @param boolean         $handle404  handle 404 error ?
      * 
      * @return void
      */
-    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to)
+    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false)
     {
         $this->mailer = $mailer;
 
@@ -48,6 +51,8 @@ class Notifier
         $this->from = $from;
 
         $this->to = $to;
+
+        $this->handle404 = $handle404;
     }
 
     /**
@@ -63,9 +68,12 @@ class Notifier
 
         // Http Error
         if ($exception instanceof HttpException) {
-            
+
             if ($exception->getStatusCode() == 404) {
                 // we handle 404 Error ?
+                if (false === $this->handle404) {
+                    return;
+                }
             } else if ($exception->getStatusCode() != 500) {
                 // always catch 500
                 return;

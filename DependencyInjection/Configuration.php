@@ -26,6 +26,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('to')->cannotBeEmpty()->end()
                 ->scalarNode('from')->cannotBeEmpty()->end()
+                ->booleanNode('handle404')->cannotBeEmpty()->setDefaultValue(false)->end()
             ->end();
 
         return $treeBuilder;

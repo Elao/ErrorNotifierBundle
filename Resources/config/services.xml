@@ -15,6 +15,7 @@
             <argument type="service" id="templating" />
             <argument>%elao.error_notifier.from%</argument> <!-- send mail from ? -->
             <argument>%elao.error_notifier.to%</argument> <!-- send mail to ? -->
+            <argument>%elao.error_notifier.handle404%</argument> <!-- handle 404 error ? -->
         </service>
     </services>
 
