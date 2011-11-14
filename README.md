@@ -10,7 +10,7 @@ Add the followings lines to your `deps` file
 
 #Configuration
 
-Add in your `config_prog.yml` file, you don't need this lines when you are in dev environment.
+Add in your `config_prod.yml` file, you don't need this lines when you are in dev environment.
 
 ```yml
 elao_error_notifier:
