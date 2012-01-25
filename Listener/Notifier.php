@@ -33,13 +33,13 @@ class Notifier
 
     /**
      * __construct
-     * 
+     *
      * @param Swift_Mailer    $mailer     mailer
      * @param EngineInterface $templating templating
      * @param string          $from       send mail from
      * @param string          $to         send mail to
      * @param boolean         $handle404  handle 404 error ?
-     * 
+     *
      * @return void
      */
     public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false)
@@ -57,9 +57,9 @@ class Notifier
 
     /**
      * Handle the event
-     * 
+     *
      * @param GetResponseForExceptionEvent $event event
-     * 
+     *
      * @return void
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
@@ -81,8 +81,8 @@ class Notifier
         }
 
         $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
-            'exception' => $e,
-            'exception_class' => getclass($exception),
+            'exception' => $exception,
+            'exception_class' => get_class($exception),
             'request' => $event->getRequest(),
         ));
 
