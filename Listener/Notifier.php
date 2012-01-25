@@ -5,6 +5,8 @@ namespace Elao\ErrorNotifierBundle\Listener;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use \Swift_Mailer;
 
 use Symfony\Component\Templating\EngineInterface;
@@ -64,35 +66,29 @@ class Notifier
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        $exception = $event->getException();
-
-        // Http Error
-        if ($exception instanceof HttpException) {
-
-            if ($exception->getStatusCode() == 404) {
-                // we handle 404 Error ?
-                if (false === $this->handle404) {
-                    return;
-                }
-            } else if ($exception->getStatusCode() != 500) {
-                // always catch 500
-                return;
-            }
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+            return;
         }
 
-        $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
-            'exception' => $exception,
-            'exception_class' => get_class($exception),
-            'request' => $event->getRequest(),
-        ));
+        $exception = $event->getException();
 
-        $mail = \Swift_Message::newInstance()
-                ->setSubject('[' . $event->getRequest()->headers->get('host') . '] Error')
-                ->setFrom($this->from)
-                ->setTo($this->to)
-                ->setContentType('text/html')
-                ->setBody($body);
+        if ($exception instanceof HttpException) {
+            if (500 === $exception->getStatusCode() || (404 === $exception->getStatusCode() && true === $this->handle404)) {
+                $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
+                    'exception'       => $exception,
+                    'exception_class' => get_class($exception),
+                    'request'         => $event->getRequest(),
+                ));
 
-        $this->mailer->send($mail);
+                $mail = \Swift_Message::newInstance()
+                    ->setSubject('[' . $event->getRequest()->headers->get('host') . '] Error')
+                    ->setFrom($this->from)
+                    ->setTo($this->to)
+                    ->setContentType('text/html')
+                    ->setBody($body);
+
+                $this->mailer->send($mail);
+            }
+        }
     }
 }
