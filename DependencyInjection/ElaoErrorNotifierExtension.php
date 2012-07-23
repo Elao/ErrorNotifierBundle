@@ -17,10 +17,10 @@ class ElaoErrorNotifierExtension extends Extension
 
     /**
      * load configuration
-     * 
+     *
      * @param array            $configs   configs
      * @param ContainerBuilder $container container
-     * 
+     *
      * @return void
      */
     public function load(array $configs, ContainerBuilder $container)
