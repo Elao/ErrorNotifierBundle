@@ -1,91 +1,565 @@
-<h2>{{ exception_class }} : {{ exception.message }}</h2>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="robots" content="noindex,nofollow" />
+        <title>    No route found for &quot;GET /test&quot; (404 Not Found)
+</title>
+        <style type="text/css">
+        html {
+            background: #eee;
+        }
 
-<h3>Information:</h3>
-<strong>Generated at: </strong> {{ "now"|date("d-m-Y H:i:s") }} <br />
-<strong>Class name: </strong> {{ exception_class }} <br />
-<strong>Message: </strong> {{ exception.message }} <br />
-<strong>Uri: </strong> {{ request.uri }} <br />
+        body {
+            font: 11px Verdana, Arial, sans-serif;
+            color: #333;
+        }
 
-<h3>Stack trace:</h3>
-{% for trace in exception.trace %}
-    #{{ loop.index0 }} -
-        {% if trace.class is defined %}
-            {{ trace.class }}{{ trace.type }}{{ trace.function }}()
-        {% else %}
-            {{ trace.function }}()
-        {% endif %}
-        {% if trace.file is defined %}
-            in {{ trace.file }} line {{ trace.line }}
-        {% endif %}
-    <br />
-{% endfor %}
+        .sf-exceptionreset, .sf-exceptionreset .block, .sf-exceptionreset #message {
+            margin: auto;
+        }
 
-<h4>Request GET Parameters</h4>
+        img {
+            border: 0;
+        }
 
-{% if request.query.all|length %}
-    {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.query } only %}
-{% else %}
-    <p>
-        <em>No GET parameters</em>
-    </p>
-{% endif %}
+        .clear {
+            clear: both;
+            height: 0;
+            font-size: 0;
+            line-height: 0;
+        }
 
-<h4>Request POST Parameters</h4>
+        .clear_fix:after {
+            content: "\0020";
+            display: block;
+            height: 0;
+            clear: both;
+            visibility: hidden;
+        }
+        .clear_fix {
+            display: inline-block;
+        }
+        * html .clear_fix {
+            height: 1%;
+        }
+        .clear_fix {
+            display: block;
+        }
 
-{% if request.request.all|length %}
-    {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.request } only %}
-{% else %}
-    <p>
-        <em>No POST parameters</em>
-    </p>
-{% endif %}
+        .header {
+            padding: 30px 30px 20px 30px;
+        }
 
-<h4>Request Attributes</h4>
+        pre {
+            white-space: normal;
+            font-family: Arial, Helvetica, sans-serif;
+        }
 
-{% if request.attributes.all|length %}
-    {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.attributes } only %}
-{% else %}
-    <p>
-        <em>No attributes</em>
-    </p>
-{% endif %}
+        table td {
+            text-align: left;
+        }
 
-<h4>Request Cookies</h4>
+        /*
+        Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+        Code licensed under the BSD License:
+        http://developer.yahoo.com/yui/license.html
+        version: 3.1.2
+        build: 56
+        */
+        .sf-exceptionreset html{color:#000;background:#FFF;}.sf-exceptionreset body,.sf-exceptionreset div,.sf-exceptionreset dl,.sf-exceptionreset dt,.sf-exceptionreset dd,.sf-exceptionreset ul,.sf-exceptionreset ol,.sf-exceptionreset li,.sf-exceptionreset h1,.sf-exceptionreset h2,.sf-exceptionreset h3,.sf-exceptionreset h4,.sf-exceptionreset h5,.sf-exceptionreset h6,.sf-exceptionreset pre,.sf-exceptionreset code,.sf-exceptionreset form,.sf-exceptionreset fieldset,.sf-exceptionreset legend,.sf-exceptionreset input,.sf-exceptionreset textarea,.sf-exceptionreset p,.sf-exceptionreset blockquote,.sf-exceptionreset th,.sf-exceptionreset td{margin:0;padding:0;}.sf-exceptionreset .sf-exceptionreset fieldset,.sf-exceptionreset img{border:0;}.sf-exceptionreset address,.sf-exceptionreset caption,.sf-exceptionreset cite,.sf-exceptionreset code,.sf-exceptionreset dfn,.sf-exceptionreset em,.sf-exceptionreset strong,.sf-exceptionreset th,.sf-exceptionreset var{font-style:normal;font-weight:normal;}.sf-exceptionreset li{list-style:none;}.sf-exceptionreset caption,.sf-exceptionreset th{text-align:left;}.sf-exceptionreset h1,.sf-exceptionreset h2,.sf-exceptionreset h3,.sf-exceptionreset h4,.sf-exceptionreset h5,.sf-exceptionreset h6{font-size:100%;font-weight:normal;}.sf-exceptionreset q:before,.sf-exceptionreset q:after{content:'';}.sf-exceptionreset abbr,.sf-exceptionreset acronym{border:0;font-variant:normal;}.sf-exceptionreset sup{vertical-align:text-top;}.sf-exceptionreset sub{vertical-align:text-bottom;}.sf-exceptionreset input,.sf-exceptionreset textarea,.sf-exceptionreset select{font-family:inherit;font-size:inherit;font-weight:inherit;}.sf-exceptionreset input,.sf-exceptionreset textarea,.sf-exceptionreset select{*font-size:100%;}.sf-exceptionreset legend{color:#000;}
 
-{% if request.cookies.all|length %}
-    {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.cookies } only %}
-{% else %}
-    <p>
-        <em>No cookies</em>
-    </p>
-{% endif %}
+        .sf-exceptionreset html,
+        .sf-exceptionreset body {
+            width: 100%;
+            min-height: 100%;
+            _height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .sf-exceptionreset body {
+            font: 1em "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+            text-align: left;
+            background-color: #efefef;
+        }
 
-<h4>Request Headers</h4>
+        .sf-exceptionreset abbr {
+            border-bottom: 1px dotted #000;
+            cursor: help;
+        }
 
-{% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.headers } only %}
+        .sf-exceptionreset p {
+            font-size: 14px;
+            line-height: 20px;
+            color: #868686;
+            padding-bottom: 20px;
+        }
 
-<h4>Request Server Parameters</h4>
+        .sf-exceptionreset strong {
+            color: #313131;
+            font-weight: bold;
+        }
 
-{% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.server } only %}
+        .sf-exceptionreset a {
+            color: #6c6159;
+        }
+        .sf-exceptionreset a img {
+            border: none;
+        }
+        .sf-exceptionreset a:hover {
+            text-decoration: underline;
+        }
 
-<h4>Session Attributes</h4>
+        .sf-exceptionreset em {
+            font-style: italic;
+        }
 
-{% if request.session.all|length %}
-    <table>
-        <tr>
-            <th>Key</th>
-            <th>Value</th>
-        </tr>
-        {% set attributes = request.session.all %}
-        {% for key in attributes|keys|sort %}
-            <tr>
-                <th>{{ key }}</th>
-                <td>{{ attributes[key]|yaml_dump }}</td>
-            </tr>
-        {% endfor %}
-    </table>
-{% else %}
-    <p>
-        <em>No session attributes</em>
-    </p>
-{% endif %}
+        .sf-exceptionreset h2,
+        .sf-exceptionreset h3 {
+            font-weight: bold;
+        }
+        .sf-exceptionreset h1 {
+            font-family: Georgia, "Times New Roman", Times, serif;
+            font-size: 20px;
+            color: #313131;
+            word-break: break-all;
+        }
+
+        .sf-exceptionreset li {
+            padding-bottom: 10px;
+        }
+
+        .sf-exceptionreset .traces {
+            padding-bottom: 14px;
+        }
+        .sf-exceptionreset .traces li {
+            font-size: 12px;
+            color: #868686;
+            padding: 5px 4px;
+            list-style-type: decimal;
+            margin-left: 20px;
+            white-space: break-word;
+        }
+        .sf-exceptionreset #logs .traces li.error {
+            font-style: normal;
+            color: #AA3333;
+            background: #f9ecec;
+        }
+        .sf-exceptionreset #logs .traces li.warning {
+            font-style: normal;
+            background: #ffcc00;
+        }
+        /* fix for Opera not liking empty <li> */
+        .sf-exceptionreset .traces li:after {
+            content: "\00A0";
+        }
+
+        .sf-exceptionreset .trace {
+            border: 1px solid #D3D3D3;
+            padding: 10px;
+            overflow: auto;
+            margin: 10px 0 20px;
+        }
+
+        .sf-exceptionreset .block,
+        .sf-exceptionreset .block_exception {
+            -moz-border-radius: 16px;
+            -webkit-border-radius: 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+        .sf-exceptionreset .block {
+            background-color: #FFFFFF;
+            border: 1px solid #dfdfdf;
+            padding: 40px 50px;
+        }
+        .sf-exceptionreset .block_exception div {
+            color: #313131;
+            font-size: 10px;
+        }
+
+        .sf-exceptionreset .block_exception_detected .illustration_exception,
+        .sf-exceptionreset .block_exception_detected .text_exception {
+            float: left;
+        }
+        .sf-exceptionreset .block_exception_detected .illustration_exception {
+            width: 152px;
+        }
+        .sf-exceptionreset .block_exception_detected .text_exception {
+            width: 670px;
+            padding: 30px 44px 24px 46px;
+            position: relative;
+        }
+
+        .sf-exceptionreset .text_exception .open_quote,
+        .sf-exceptionreset .text_exception .close_quote {
+            position: absolute;
+        }
+        .sf-exceptionreset .open_quote {
+            top: 0;
+            left: 0;
+        }
+        .sf-exceptionreset .close_quote {
+            bottom: 0;
+            right: 50px;
+        }
+
+        .sf-exceptionreset .block_exception p {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .sf-exceptionreset .block_exception p a,
+        .sf-exceptionreset .block_exception p a:hover {
+            color: #565656;
+        }
+
+        .sf-exceptionreset h2 {
+            font-size: 16px;
+            font-family: Arial, Helvetica, sans-serif;
+            padding-bottom: 16px;
+        }
+
+        .sf-exceptionreset li a {
+            background: none;
+            color: #868686;
+            text-decoration: none;
+        }
+
+        .sf-exceptionreset li a:hover {
+            background: none;
+            color: #313131;
+            text-decoration: underline;
+        }
+
+        .sf-exceptionreset .logs h2 {
+            float: left;
+            width: 654px;
+        }
+
+        .sf-exceptionreset .error_count {
+            float: right;
+            width: 170px;
+            text-align: right;
+        }
+
+        .sf-exceptionreset .error_count span {
+            display: inline-block;
+            background-color: #aacd4e;
+            -moz-border-radius: 6px;
+            -webkit-border-radius: 6px;
+            border-radius: 6px;
+            padding: 4px;
+            color: white;
+            margin-right: 2px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .sf-exceptionreset .toggle {
+            vertical-align: middle;
+        }
+
+        .sf-exceptionreset .linked ul,
+        .sf-exceptionreset .linked li {
+            display: inline;
+        }
+
+        .sf-exceptionreset #output_content {
+            color: #000;
+            font-size: 12px;
+        }
+
+        .sf-exceptionreset ol {
+            padding: 10px 0;
+        }
+        .sf-exceptionreset ol li {
+            list-style: decimal;
+            margin-left: 20px;
+            padding: 2px;
+            padding-bottom: 20px;
+        }
+        .sf-exceptionreset ol ol li {
+            list-style-position: inside;
+            margin-left: 0;
+            white-space: nowrap;
+            font-size: 12px;
+            padding-bottom: 0;
+        }
+        .sf-exceptionreset li .selected {
+            background-color: #ffd;
+        }
+        </style>
+    </head>
+    <body>
+        <div id="content">
+                <div class="sf-exceptionreset">
+                    <div class="block_exception">
+                        <div class="block_exception_detected clear_fix">
+                            <table style="background-color: #F6F6F6; border: 1px solid #DFDFDF; padding: 30px 28px; width: 100%;">
+                                <tr>
+                                    <td style="width: 150px;">
+                                        <div class="illustration_exception">
+                                                <img alt="Exception detected!" src="http://schuleb.hpm.inet-dev.adscs.lan/bundles/framework/images/exception_detected.png"/>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="text_exception">
+                                            <h1>{{ exception.message }}</h1>
+                                            <div>
+                                                <strong>{{ status_code }}</strong> - {{ exception_class|abbr_class }}
+                                            </div>
+                                            <!--<div class="linked"><span><strong>1</strong> linked Exception:</span>
+                                                    <ul>
+                                                            <li>
+                                                                    <abbr title="Symfony\Component\Routing\Exception\ResourceNotFoundException">ResourceNotFoundException</abbr> 
+                                                            </li>
+                                                    </ul>
+                                            </div>-->
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                {#-- Trace Block --#}
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Information:</h4>
+                            <strong>Generated at: </strong> {{ "now"|date("d-m-Y H:i:s") }} <br />
+                            <strong>Class name: </strong> {{ exception_class }} <br />
+                            <strong>Message: </strong> {{ exception.message }} <br />
+                            <strong>Uri: </strong> {{ request.uri }} <br />
+                        </td>
+                    </tr>
+                </table>
+
+                {#-- Trace Block --#}
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <div class="block">
+                                <h4>Stack Trace</h4>
+
+                                {# see TwigBundle:Exception:traces.html.twig #}
+                                <ol class="traces list_exception" id="traces">
+                                    {% for i, trace in exception.trace %}
+                                        {# see TwigBundle:Exception:trace.html.twig #}
+                                        <li>
+                                        {% if trace.class is defined %}
+                                            at
+                                            <strong>
+                                                <abbr title="{{ trace.class }}">{{ trace.class }}</abbr>
+                                                {{ trace.type ~ trace.function }}
+                                            </strong>
+                                            ({{ trace.args }})
+                                            {#({{ trace.args|format_args }})#}
+                                        {% else %}
+                                            {{ trace.function }}()
+                                        {% endif %}
+                                        {% if trace.file is defined and trace.file and trace.line is defined and trace.line %}
+                                            {{ trace.function ? '<br />' : '' }}
+                                            in {{ trace.file|format_file(trace.line) }}&nbsp;
+                                            <div id="trace_{{ 0 ~ '_' ~ i }}" class="trace">
+                                                {{ trace.file|file_excerpt(trace.line) }}
+                                            </div>
+                                        {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                        </td>
+                    </tr>
+                    </tr>
+                </table>
+    
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+                
+                {#-- Logs Block --#}
+                {% if logger %}
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <div id="logs">
+                                <h4>Logs</h4>
+                                {% include 'TwigBundle:Exception:logs.html.twig' with { 'logs': logger.logs } only %}
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+                {% endif %}
+                
+                {#-- Request GET Parameters Block --#}
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Request GET Parameters</h4>
+
+                            {% if request.query.all|length %}
+                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.query } only %}
+                            {% else %}
+                                <p>
+                                    <em>No GET parameters</em>
+                                </p>
+                            {% endif %}       
+                        </td>
+                    </tr>
+                </table>
+                
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+    
+                {#-- Request POST Parameters Block --#}
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Request POST Parameters</h4>
+
+                            {% if request.request.all|length %}
+                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.query } only %}
+                            {% else %}
+                                <p>
+                                    <em>No POST parameters</em>
+                                </p>
+                            {% endif %}       
+                        </td>
+                    </tr>
+                </table>
+                
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+    
+                {#-- Request Attributes Block --#}
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Request Attributes</h4>
+
+                            {% if request.attributes.all|length %}
+                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.query } only %}
+                            {% else %}
+                                <p>
+                                    <em>No Request Attributes</em>
+                                </p>
+                            {% endif %}       
+                        </td>
+                    </tr>
+                </table>
+                
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+    
+                {#-- Request Cookies Block --#}
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Request Cookies</h4>
+
+                            {% if request.cookies.all|length %}
+                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.query } only %}
+                            {% else %}
+                                <p>
+                                    <em>No Request Cookies</em>
+                                </p>
+                            {% endif %}       
+                        </td>
+                    </tr>
+                </table>
+                
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+    
+                {#-- Request Headers Block --#}
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Request Headers</h4>
+                            {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.headers } only %}     
+                        </td>
+                    </tr>
+                </table>
+                
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+    
+                {#-- Request Server Parameters Block --#}
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Request Server Parameters </h4>
+                            {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.server } only %}     
+                        </td>
+                    </tr>
+                </table>
+                
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+                
+                {#-- Request Session Attributes Block --#}
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Session Attributes</h4>
+
+                            {% if request.session.all|length %}
+                                <table>
+                                    <tr>
+                                        <th>Key</th>
+                                        <th>Value</th>
+                                    </tr>
+                                    {% set attributes = request.session.all %}
+                                    {% for key in attributes|keys|sort %}
+                                        <tr>
+                                            <th>{{ key }}</th>
+                                            <td>{{ attributes[key]|yaml_dump }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            {% else %}
+                                <p>
+                                    <em>No session attributes</em>
+                                </p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+                
+            </div>
+        </div>
+    </body>
+</html>
