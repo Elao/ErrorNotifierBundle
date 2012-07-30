@@ -2,12 +2,12 @@
 
 namespace Elao\ErrorNotifierBundle\Listener;
 
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use \Swift_Mailer;
-
 use Symfony\Component\Templating\EngineInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 
 /**
  * Notifier
@@ -45,13 +45,10 @@ class Notifier
     public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false)
     {
         $this->mailer = $mailer;
-
         $this->templating = $templating;
-
+        
         $this->from = $from;
-
         $this->to = $to;
-
         $this->handle404 = $handle404;
     }
 
@@ -72,10 +69,12 @@ class Notifier
 
         if ($exception instanceof HttpException) {
             if (500 === $exception->getStatusCode() || (404 === $exception->getStatusCode() && true === $this->handle404)) {
+
                 $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
                     'exception'       => $exception,
                     'exception_class' => get_class($exception),
                     'request'         => $event->getRequest(),
+                    'status_code'     => $exception->getStatusCode()
                 ));
 
                 $mail = \Swift_Message::newInstance()
