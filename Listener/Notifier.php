@@ -42,7 +42,8 @@ class Notifier
      *
      * @return void
      */
-    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false) {
+    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false)
+    {
         $this->mailer = $mailer;
         $this->templating = $templating;
         
