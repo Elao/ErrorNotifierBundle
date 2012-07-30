@@ -379,26 +379,6 @@
                     </tr>
                 </table>
                 
-                {#-- Logs Block --#}
-                {% if logger %}
-                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
-                    <tr>
-                        <td>
-                            <div id="logs">
-                                <h4>Logs</h4>
-                                {% include 'TwigBundle:Exception:logs.html.twig' with { 'logs': logger.logs } only %}
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-                
-                <table>
-                    <tr>
-                        <td style="height: 20px;"></td>
-                    </tr>
-                </table>
-                {% endif %}
-                
                 {#-- Request GET Parameters Block --#}
                 <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
                     <tr>

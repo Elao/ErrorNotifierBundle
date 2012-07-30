@@ -36,17 +36,15 @@ class Notifier
      *
      * @param Swift_Mailer    $mailer     mailer
      * @param EngineInterface $templating templating
-     * @param LoggerInterface $logger
      * @param string          $from       send mail from
      * @param string          $to         send mail to
      * @param boolean         $handle404  handle 404 error ?
      *
      * @return void
      */
-    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false, DebugLoggerInterface $logger = null) {
+    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false) {
         $this->mailer = $mailer;
         $this->templating = $templating;
-        $this->logger = $logger;
         
         $this->from = $from;
         $this->to = $to;
@@ -70,13 +68,11 @@ class Notifier
 
         if ($exception instanceof HttpException) {
             if (500 === $exception->getStatusCode() || (404 === $exception->getStatusCode() && true === $this->handle404)) {
-                $logger = $this->logger instanceof DebugLoggerInterface ? $this->logger : null;
 
                 $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
                     'exception'       => $exception,
                     'exception_class' => get_class($exception),
                     'request'         => $event->getRequest(),
-                    'logger'          => $logger,
                     'status_code'     => $exception->getStatusCode()
                 ));
 
