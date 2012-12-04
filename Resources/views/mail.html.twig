@@ -309,7 +309,7 @@
                                             <!--<div class="linked"><span><strong>1</strong> linked Exception:</span>
                                                     <ul>
                                                             <li>
-                                                                    <abbr title="Symfony\Component\Routing\Exception\ResourceNotFoundException">ResourceNotFoundException</abbr> 
+                                                                    <abbr title="Symfony\Component\Routing\Exception\ResourceNotFoundException">ResourceNotFoundException</abbr>
                                                             </li>
                                                     </ul>
                                             </div>-->
@@ -352,8 +352,12 @@
                                                 <abbr title="{{ trace.class }}">{{ trace.class }}</abbr>
                                                 {{ trace.type ~ trace.function }}
                                             </strong>
-                                            ({{ trace.args }})
-                                            {#({{ trace.args|format_args }})#}
+
+                                           {% if trace.args is iterable %}
+                                               {{ trace.args|json_encode }}
+                                           {% else %}
+                                               ({{ trace.args }})
+                                           {% endif %}
                                         {% else %}
                                             {{ trace.function }}()
                                         {% endif %}
@@ -372,13 +376,13 @@
                     </tr>
                     </tr>
                 </table>
-    
+
                 <table>
                     <tr>
                         <td style="height: 20px;"></td>
                     </tr>
                 </table>
-                
+
                 {#-- Request GET Parameters Block --#}
                 <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
                     <tr>
@@ -391,17 +395,17 @@
                                 <p>
                                     <em>No GET parameters</em>
                                 </p>
-                            {% endif %}       
+                            {% endif %}
                         </td>
                     </tr>
                 </table>
-                
+
                 <table>
                     <tr>
                         <td style="height: 20px;"></td>
                     </tr>
                 </table>
-    
+
                 {#-- Request POST Parameters Block --#}
                 <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
                     <tr>
@@ -414,17 +418,17 @@
                                 <p>
                                     <em>No POST parameters</em>
                                 </p>
-                            {% endif %}       
+                            {% endif %}
                         </td>
                     </tr>
                 </table>
-                
+
                 <table>
                     <tr>
                         <td style="height: 20px;"></td>
                     </tr>
                 </table>
-    
+
                 {#-- Request Attributes Block --#}
                 <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
                     <tr>
@@ -437,17 +441,17 @@
                                 <p>
                                     <em>No Request Attributes</em>
                                 </p>
-                            {% endif %}       
+                            {% endif %}
                         </td>
                     </tr>
                 </table>
-                
+
                 <table>
                     <tr>
                         <td style="height: 20px;"></td>
                     </tr>
                 </table>
-    
+
                 {#-- Request Cookies Block --#}
                 <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
                     <tr>
@@ -460,49 +464,49 @@
                                 <p>
                                     <em>No Request Cookies</em>
                                 </p>
-                            {% endif %}       
+                            {% endif %}
                         </td>
                     </tr>
                 </table>
-                
+
                 <table>
                     <tr>
                         <td style="height: 20px;"></td>
                     </tr>
                 </table>
-    
+
                 {#-- Request Headers Block --#}
                 <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
                     <tr>
                         <td>
                             <h4>Request Headers</h4>
-                            {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.headers } only %}     
+                            {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.headers } only %}
                         </td>
                     </tr>
                 </table>
-                
+
                 <table>
                     <tr>
                         <td style="height: 20px;"></td>
                     </tr>
                 </table>
-    
+
                 {#-- Request Server Parameters Block --#}
                 <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
                     <tr>
                         <td>
                             <h4>Request Server Parameters </h4>
-                            {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.server } only %}     
+                            {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.server } only %}
                         </td>
                     </tr>
                 </table>
-                
+
                 <table>
                     <tr>
                         <td style="height: 20px;"></td>
                     </tr>
                 </table>
-                
+
                 {#-- Request Session Attributes Block --#}
                 <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
                     <tr>
@@ -531,13 +535,13 @@
                         </td>
                     </tr>
                 </table>
-                
+
                 <table>
                     <tr>
                         <td style="height: 20px;"></td>
                     </tr>
                 </table>
-                
+
             </div>
         </div>
     </body>
