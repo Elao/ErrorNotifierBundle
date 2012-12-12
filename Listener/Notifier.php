@@ -46,7 +46,7 @@ class Notifier
     {
         $this->mailer = $mailer;
         $this->templating = $templating;
-        
+
         $this->from = $from;
         $this->to = $to;
         $this->handle404 = $handle404;

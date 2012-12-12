@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
-
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 /**
@@ -33,9 +33,13 @@ class ElaoErrorNotifierExtension extends Extension
             $container->setParameter('elao.error_notifier.from', $config['from']);
             $container->setParameter('elao.error_notifier.to', $config['to']);
             $container->setParameter('elao.error_notifier.handle404', $config['handle404']);
-
             $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config/')));
             $loader->load('services.xml');
+
+            if ($config['mailer'] != 'mailer') {
+                $container->getDefinition('elao.error_notifier.listener')->replaceArgument(0, new Reference($config['mailer']));
+            }
+
         }
     }
 }

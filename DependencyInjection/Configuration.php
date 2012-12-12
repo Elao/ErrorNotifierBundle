@@ -27,6 +27,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('to')->cannotBeEmpty()->end()
                 ->scalarNode('from')->cannotBeEmpty()->end()
                 ->booleanNode('handle404')->defaultValue(false)->end()
+                ->scalarNode('mailer')->defaultValue('mailer')->end()
             ->end();
 
         return $treeBuilder;
