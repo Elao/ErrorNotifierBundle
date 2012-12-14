@@ -20,7 +20,7 @@ Add this in your `composer.json`
         "elao/error-notifier-bundle" : "dev-master"
     },
 
-And run php composer.phar update elao/error-notifier-bundle
+And run `php composer.phar update elao/error-notifier-bundle`
 
 #### If you are (still) working with Symfony 2.0.x
 
