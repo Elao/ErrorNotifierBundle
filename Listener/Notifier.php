@@ -86,6 +86,16 @@ class Notifier
         }
     }
     
+    /**
+     * Once we have the request we can use it to show debug details in the email
+     * 
+     * Ideally the handlers would be registered earlier on in the boot process
+     * so that compilation errors (like missing config files) could be caught
+     * but that would mean that the DI Container wouldn't be completed so we'd
+     * have to mess around with instantiating the mailer and twig etc
+     * 
+     * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+     */
     public function onKernelRequest(GetResponseEvent $event)
     {
         
@@ -106,14 +116,11 @@ class Notifier
             register_shutdown_function(array($this, 'handlePhpFatalErrorAndWarnings'));
         }
 
-        
     }
     
-    
-
     /**
      *
-     * 
+     * @see http://php.net/set_error_handler
      * @param integer $level
      * @param string $message
      * @param string $file
@@ -139,6 +146,10 @@ class Notifier
         return false; // in order not to bypass the standard PHP error handler
     }
 
+    /**
+     * @see http://php.net/register_shutdown_function
+     * Use this shutdown function to see if there were any errors
+     */
     public function handlePhpFatalErrorAndWarnings()
     {
         self::_freeMemory();
@@ -163,8 +174,15 @@ class Notifier
         }
     }
     
+    /**
+     * Convert the error code to a readable format
+     * 
+     * @param integer $errorNo
+     * @return string
+     */
     public function getErrorString($errorNo)
     {
+        // may be exhaustive, but not sure
         $errorStrings = array(
             E_ERROR => 'E_ERROR',
             E_PARSE => 'E_PARSE', 
