@@ -388,10 +388,21 @@
                     <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
                         <tr>
                             <td>
-                                <h4>Variables</h4>
+                                <h4>Scope Variables</h4>
 
                                 {% if context|length %}
-                                    {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': context } only %}
+                                    <table>
+                                        <tr>
+                                            <th>Variable</th>
+                                            <th>Value</th>
+                                        </tr>
+                                        {% for key, value in context %}
+                                            <tr>
+                                                <th>${{ key }}</th>
+                                                <td>= {{ value|yaml_dump }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
                                 {% else %}
                                     <p>
                                         <em>No variables captured</em>

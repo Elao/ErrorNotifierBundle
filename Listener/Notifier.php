@@ -185,6 +185,12 @@ class Notifier
         
     }
     
+    /**
+     * 
+     * @param ErrorException $exception
+     * @param Request $request
+     * @param array $context
+     */
     public function createMailAndSend($exception, $request, $context = null)
     {
         
@@ -192,7 +198,9 @@ class Notifier
             'exception'       => $exception,
             'exception_class' => get_class($exception),
             'request'         => $request,
-            'status_code'     => $exception->getCode()
+            'status_code'     => $exception->getCode(),
+            // This is probably too dangerous as it could contain recursive objects
+            //'context'         => $context
         ));
 
         $mail = \Swift_Message::newInstance()
