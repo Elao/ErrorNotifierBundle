@@ -352,12 +352,13 @@
                                                 <abbr title="{{ trace.class }}">{{ trace.class }}</abbr>
                                                 {{ trace.type ~ trace.function }}
                                             </strong>
-
-                                           {% if trace.args is iterable %}
-                                               {{ trace.args|json_encode }}
-                                           {% else %}
-                                               ({{ trace.args }})
-                                           {% endif %}
+                                            {% if trace.args is defined %}
+                                                {% if trace.args is iterable %}
+                                                    {{ trace.args|json_encode }}
+                                                {% else %}
+                                                    ({{ trace.args }})
+                                                {% endif %}
+                                            {% endif %}
                                         {% else %}
                                             {{ trace.function }}()
                                         {% endif %}
@@ -382,7 +383,30 @@
                         <td style="height: 20px;"></td>
                     </tr>
                 </table>
+                {% if context is defined %}
+                    {#-- Variables Parameters Block --#}
+                    <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                        <tr>
+                            <td>
+                                <h4>Variables</h4>
 
+                                {% if context|length %}
+                                    {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': context } only %}
+                                {% else %}
+                                    <p>
+                                        <em>No variables captured</em>
+                                    </p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table>
+                        <tr>
+                            <td style="height: 20px;"></td>
+                        </tr>
+                    </table>
+                {% endif %}
                 {#-- Request GET Parameters Block --#}
                 <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
                     <tr>
