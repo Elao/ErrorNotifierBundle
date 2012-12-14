@@ -6,7 +6,6 @@ use \Swift_Mailer;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
@@ -31,12 +30,12 @@ class Notifier
     private $to;
 
     private $handle404;
-    
+
     private $reportWarnings = false;
     private $reportErrors = false;
-    
+
     private $request;
-    
+
     private static $tmpBuffer = null;
 
     /**
@@ -47,8 +46,6 @@ class Notifier
      * @param string          $from       send mail from
      * @param string          $to         send mail to
      * @param boolean         $handle404  handle 404 error ?
-     *
-     * @return void
      */
     public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false, $handlePHPErrors = false, $handlePHPWarnings = false)
     {
@@ -58,7 +55,7 @@ class Notifier
         $this->from = $from;
         $this->to = $to;
         $this->handle404 = $handle404;
-        
+
         $this->reportErrors = $handlePHPErrors;
         $this->reportWarnings = $handlePHPWarnings;
     }
@@ -67,8 +64,6 @@ class Notifier
      * Handle the event
      *
      * @param GetResponseForExceptionEvent $event event
-     *
-     * @return void
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
@@ -85,26 +80,25 @@ class Notifier
             }
         }
     }
-    
+
     /**
      * Once we have the request we can use it to show debug details in the email
-     * 
+     *
      * Ideally the handlers would be registered earlier on in the boot process
      * so that compilation errors (like missing config files) could be caught
      * but that would mean that the DI Container wouldn't be completed so we'd
      * have to mess around with instantiating the mailer and twig etc
-     * 
+     *
      * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        
-        if($this->reportErrors || $this->reportWarnings)
-        {
+
+        if ($this->reportErrors || $this->reportWarnings) {
             self::_reserveMemory();
-            
+
             $this->request = $event->getRequest();
-            
+
             // set_error_handler and register_shutdown_function can be triggered on
             // both warnings and errors
             set_error_handler(array($this, 'handlePhpError'), E_ALL);
@@ -117,13 +111,13 @@ class Notifier
         }
 
     }
-    
+
     /**
      *
      * @see http://php.net/set_error_handler
      * @param integer $level
-     * @param string $message
-     * @param string $file
+     * @param string  $message
+     * @param string  $file
      * @param integer $line
      *
      * @throws ErrorException
@@ -138,11 +132,11 @@ class Notifier
         if (!$this->reportWarnings && in_array($level, $warningsCodes)) {
             return false;
         }
-     
+
         $exception = new \ErrorException(sprintf('%s: %s in %s line %d', $this->getErrorString($level), $message, $file, $line), 0, $level, $file, $line);
-        
+
         $this->createMailAndSend($exception, $this->request, $errcontext);
-        
+
         return false; // in order not to bypass the standard PHP error handler
     }
 
@@ -173,45 +167,49 @@ class Notifier
             $this->createMailAndSend($exception, $this->request);
         }
     }
-    
+
     /**
      * Convert the error code to a readable format
-     * 
-     * @param integer $errorNo
+     *
+     * @param  integer $errorNo
      * @return string
      */
     public function getErrorString($errorNo)
     {
         // may be exhaustive, but not sure
         $errorStrings = array(
-            E_ERROR => 'E_ERROR',
-            E_PARSE => 'E_PARSE', 
-            E_CORE_ERROR => 'E_CORE_ERROR', 
+
+            E_WARNING           => 'Warning',
+            E_NOTICE            => 'Notice',
+            E_USER_ERROR        => 'User Error',
+            E_USER_WARNING      => 'User Warning',
+            E_USER_NOTICE       => 'User Notice',
+            E_STRICT            => 'Runtime Notice (E_STRICT)',
+            E_RECOVERABLE_ERROR => 'Catchable Fatal Error',
+            E_DEPRECATED        => 'Deprecated',
+            E_USER_DEPRECATED   => 'User Deprecated',
+
+            E_ERROR => 'Error',
+            E_PARSE => 'Parse Error',
+            E_CORE_ERROR => 'E_CORE_ERROR',
             E_COMPILE_ERROR => 'E_COMPILE_ERROR',
-            E_CORE_WARNING => 'E_CORE_WARNING', 
-            E_COMPILE_WARNING => 'E_COMPILE_WARNING', 
-            E_STRICT => 'E_STRICT',
-            E_NOTICE => 'E_STRICT', 
-            E_USER_WARNING => 'E_STRICT', 
-            E_USER_NOTICE => 'E_STRICT', 
-            E_STRICT => 'E_STRICT', 
-            E_DEPRECATED => 'E_STRICT', 
-            E_USER_DEPRECATED => 'E_STRICT'
+            E_CORE_WARNING => 'E_CORE_WARNING',
+            E_COMPILE_WARNING => 'E_COMPILE_WARNING',
         );
-        
+
         return array_key_exists($errorNo, $errorStrings) ? $errorStrings[$errorNo] : 'UNKNOWN';
-        
+
     }
-    
+
     /**
-     * 
+     *
      * @param ErrorException $exception
-     * @param Request $request
-     * @param array $context
+     * @param Request        $request
+     * @param array          $context
      */
     public function createMailAndSend($exception, $request, $context = null)
     {
-        
+
         $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
             'exception'       => $exception,
             'exception_class' => get_class($exception),
@@ -229,9 +227,9 @@ class Notifier
             ->setBody($body);
 
         $this->mailer->send($mail);
-        
+
     }
-    
+
     /**
      * This allows to catch memory limit fatal errors.
      */
