@@ -2,22 +2,9 @@
 
 ## Installation
 
-###Add the followings lines to your `deps` file
+###Add the followings to your `composer.json` file
 
-    // deps
-
-    [ElaoErrorNotifierBundle]
-        git=git://github.com/Elao/ErrorNotifierBundle.git
-        target=bundles/Elao/ErrorNotifierBundle
-
-### Register autoloading
-
-    // app/autoload.php
-
-    $loader->registerNamespaces(array(
-        ...
-        'Elao' => __DIR__.'/../vendor/bundles',
-    ));
+    "elao/error-notifier-bundle": "dev-master"
 
 ### Register the bundle
 
@@ -32,12 +19,6 @@
         );
     }
 
-### Run the vendors script:
-
-```bash
-$ php bin/vendors install
-```
-
 #Configuration
 
 Add in your `config_prod.yml` file, you don't need this lines when you are in dev environment.
@@ -47,4 +28,6 @@ elao_error_notifier:
     from: from@example.com
     to: to@example.com
     handle404: true
+    handlePHPErrors: true # catch fatal erros and email them
+    handlePHPWarnings: true # catch warnings and email them
 ```
