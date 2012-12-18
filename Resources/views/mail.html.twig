@@ -398,8 +398,8 @@
                                         </tr>
                                         {% for key, value in context %}
                                             <tr>
-                                                <th>${{ key }}</th>
-                                                <td>= {{ value|yaml_dump }}</td>
+                                                <th style="border-top: 1px solid #999; vertical-align: top;"><pre>${{ key }} =</pre></th>
+                                                <td style="border-top: 1px solid #999">{{ value|dumpy(2) }}</td>
                                             </tr>
                                         {% endfor %}
                                     </table>

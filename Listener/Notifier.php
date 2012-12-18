@@ -216,7 +216,7 @@ class Notifier
             'request'         => $request,
             'status_code'     => $exception->getCode(),
             // This is probably too dangerous as it could contain recursive objects
-            //'context'         => $context
+            'context'         => $context
         ));
 
         $mail = \Swift_Message::newInstance()
