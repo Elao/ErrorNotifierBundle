@@ -20,7 +20,7 @@
  *
  *   Default value is 1. (MAX_DEPTH const)
  *
- *
+ * @see https://gist.github.com/1747036
  * @author Goutte
  */
 

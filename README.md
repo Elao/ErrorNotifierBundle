@@ -70,3 +70,28 @@ elao_error_notifier:
 
 
 The mailer option has been added to let the application send the error mail via local smtp instead of using the regular quota on 3rd mailer services.
+
+## Twig Extension
+
+There are also some extensions that you can use in your Twig templates (thanks to [Goutte](https://github.com/Goutte))
+
+Extends Twig with
+
+    {{ "my string, whatever" | pre }}  --> wraps with <pre>
+    {{ myBigVar | yaml_dump | pre }} as {{ myBigVar | ydump }} or {{ myBigVar | dumpy }}
+    {{ myBigVar | var_dump | pre }}  as {{ myBigVar | dump }}
+
+You may control the depth of recursion with a parameter, say foo = array('a'=>array('b'=>array('c','d')))
+
+    {{ foo | dumpy(0) }} --> 'array of 1'
+    {{ foo | dumpy(2) }} -->
+                               a:
+                                 b: 'array of 2'
+    {{ foo | dumpy(3) }} -->
+                               a:
+                                 b:
+                                   - c
+                                   - d
+
+Default value is 1. (MAX_DEPTH const)
+
