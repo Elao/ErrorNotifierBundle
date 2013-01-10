@@ -75,7 +75,8 @@ class Notifier
 
         if ($exception instanceof HttpException) {
             if (500 === $exception->getStatusCode() || (404 === $exception->getStatusCode() && true === $this->handle404)) {
-
+                $this->createMailAndSend($exception, $event->getRequest());
+            } else {
                 $this->createMailAndSend($exception, $event->getRequest());
             }
         }
