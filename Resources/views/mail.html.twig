@@ -352,12 +352,13 @@
                                                 <abbr title="{{ trace.class }}">{{ trace.class }}</abbr>
                                                 {{ trace.type ~ trace.function }}
                                             </strong>
-
-                                           {% if trace.args is iterable %}
-                                               {{ trace.args|json_encode }}
-                                           {% else %}
-                                               ({{ trace.args }})
-                                           {% endif %}
+                                            {% if trace.args is defined %}
+                                                {% if trace.args is iterable %}
+                                                    {{ trace.args|json_encode }}
+                                                {% else %}
+                                                    ({{ trace.args }})
+                                                {% endif %}
+                                            {% endif %}
                                         {% else %}
                                             {{ trace.function }}()
                                         {% endif %}
@@ -382,7 +383,41 @@
                         <td style="height: 20px;"></td>
                     </tr>
                 </table>
+                {% if context is defined %}
+                    {#-- Variables Parameters Block --#}
+                    <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                        <tr>
+                            <td>
+                                <h4>Scope Variables</h4>
 
+                                {% if context|length %}
+                                    <table>
+                                        <tr>
+                                            <th>Variable</th>
+                                            <th>Value</th>
+                                        </tr>
+                                        {% for key, value in context %}
+                                            <tr>
+                                                <th style="border-top: 1px solid #999; vertical-align: top;"><pre>${{ key }} =</pre></th>
+                                                <td style="border-top: 1px solid #999">{{ value|dumpy(2) }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                {% else %}
+                                    <p>
+                                        <em>No variables captured</em>
+                                    </p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table>
+                        <tr>
+                            <td style="height: 20px;"></td>
+                        </tr>
+                    </table>
+                {% endif %}
                 {#-- Request GET Parameters Block --#}
                 <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
                     <tr>

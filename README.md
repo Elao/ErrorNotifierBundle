@@ -2,13 +2,11 @@
 
 ## What is it ?
 
-This bundle sends an email each time there is a 500 error on the production server. (It also can send an email for 404).
+This bundle sends an email each time there is a 500 error on the production server. You can also be notified of 404 or PHP fatal errors.
 
-The email contains a lot of informations :
+The email contains a lot of information :
 
-![Email ErrorNotifier Bundle](http://i48.tinypic.com/2en7xv4.png "Email ErrorNotifier Bundle")
-
-
+![Email ErrorNotifier Bundle](http://i49.tinypic.com/2wck36e.png "Email ErrorNotifier Bundle")
 
 ## Installation
 
@@ -56,7 +54,7 @@ $ php bin/vendors install
 
 ## Configuration
 
-Add in your `config_prod.yml` file, you don't need this lines when you are in dev environment.
+Add in your `config_prod.yml` file, you don't need error notifier when you are in dev environment.
 
 ```yml
 elao_error_notifier:
@@ -64,7 +62,33 @@ elao_error_notifier:
     to: to@example.com
     handle404: true # default :  false
     mailer: your.mailer.id # default : mailer
+    handlePHPErrors: true # catch fatal erros and email them
+    handlePHPWarnings: true # catch warnings and email them
 ```
 
 
 The mailer option has been added to let the application send the error mail via local smtp instead of using the regular quota on 3rd mailer services.
+
+## Twig Extension
+
+There are also some extensions that you can use in your Twig templates (thanks to [Goutte](https://github.com/Goutte))
+
+Extends Twig with
+
+    {{ "my string, whatever" | pre }}  --> wraps with <pre>
+    {{ myBigVar | yaml_dump | pre }} as {{ myBigVar | ydump }} or {{ myBigVar | dumpy }}
+    {{ myBigVar | var_dump | pre }}  as {{ myBigVar | dump }}
+
+You may control the depth of recursion with a parameter, say foo = array('a'=>array('b'=>array('c','d')))
+
+    {{ foo | dumpy(0) }} --> 'array of 1'
+    {{ foo | dumpy(2) }} -->
+                               a:
+                                 b: 'array of 2'
+    {{ foo | dumpy(3) }} -->
+                               a:
+                                 b:
+                                   - c
+                                   - d
+
+Default value is 1. (MAX_DEPTH const)
