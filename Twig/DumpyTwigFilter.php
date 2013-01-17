@@ -45,7 +45,6 @@ class DumpyTwigFilter extends \Twig_Extension
         return array(
             'pre'   => new \Twig_Filter_Method($this, 'pre', $optionsForRaw),
             'dump'  => new \Twig_Filter_Method($this, 'preDump', $optionsForRaw),
-            'ydump' => new \Twig_Filter_Method($this, 'preYamlDump', $optionsForRaw),
             'dumpy' => new \Twig_Filter_Method($this, 'preYamlDump', $optionsForRaw),
         );
     }
@@ -173,6 +172,35 @@ class DumpyTwigFilter extends \Twig_Extension
                 }
 
                 return $data;
+            }
+        }
+        
+        if(is_string($value))
+        {
+            $value = '(string) '.$value;
+        }
+        
+        if(is_int($value))
+        {
+            $value = '(int) '.$value;
+        }
+        
+        if(is_float($value))
+        {
+            $value = '(float) '.$value;
+        }
+        
+        if(is_null($value))
+        {
+            $value = 'null';
+        }
+        
+        if(is_bool($value))
+        {
+            if($value) {
+                $value = '(bool) true';
+            }else {
+                $value = '(bool) false';
             }
         }
 
