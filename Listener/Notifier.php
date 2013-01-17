@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\FlattenException;
 
 /**
  * Notifier
@@ -211,6 +212,10 @@ class Notifier
     public function createMailAndSend($exception, $request, $context = null)
     {
 
+        if (!$exception instanceof FlattenException) {
+            $exception = FlattenException::create($exception);
+        }
+        
         $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
             'exception'       => $exception,
             'exception_class' => get_class($exception),
