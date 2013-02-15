@@ -340,37 +340,39 @@
                         <td>
                             <div class="block">
                                 <h4>Stack Trace</h4>
-
-                                {# see TwigBundle:Exception:traces.html.twig #}
-                                <ol class="traces list_exception" id="traces">
-                                    {% for i, trace in exception.trace %}
-                                        {# see TwigBundle:Exception:trace.html.twig #}
-                                        <li>
-                                        {% if trace.class is defined %}
-                                            at
-                                            <strong>
-                                                <abbr title="{{ trace.class }}">{{ trace.class }}</abbr>
-                                                {{ trace.type ~ trace.function }}
-                                            </strong>
-
-                                           {% if trace.args is iterable %}
-                                               {{ trace.args|json_encode }}
-                                           {% else %}
-                                               ({{ trace.args }})
-                                           {% endif %}
-                                        {% else %}
-                                            {{ trace.function }}()
-                                        {% endif %}
-                                        {% if trace.file is defined and trace.file and trace.line is defined and trace.line %}
-                                            {{ trace.function ? '<br />' : '' }}
-                                            in {{ trace.file|format_file(trace.line) }}&nbsp;
-                                            <div id="trace_{{ 0 ~ '_' ~ i }}" class="trace">
-                                                {{ trace.file|file_excerpt(trace.line) }}
-                                            </div>
-                                        {% endif %}
-                                        </li>
-                                    {% endfor %}
-                                </ol>
+                                {% for position, e in exception.toarray %}
+                                    {# see TwigBundle:Exception:traces.html.twig #}
+                                    <ol class="traces list_exception" id="traces">
+                                        {% for i, trace in exception.trace %}
+                                            {# see TwigBundle:Exception:trace.html.twig #}
+                                            <li>
+                                            {% if trace.class is defined %}
+                                                at
+                                                <strong>
+                                                    <abbr title="{{ trace.class }}">{{ trace.class }}</abbr>
+                                                    {{ trace.type ~ trace.function }}
+                                                </strong>
+                                                {% if trace.args is defined %}
+                                                    {% if trace.args is iterable %}
+                                                        {{ trace.args|format_args }}
+                                                    {% else %}
+                                                        ({{ trace.args }})
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% else %}
+                                                {{ trace.function }}()
+                                            {% endif %}
+                                            {% if trace.file is defined and trace.file and trace.line is defined and trace.line %}
+                                                {{ trace.function ? '<br />' : '' }}
+                                                in {{ trace.file|format_file(trace.line) }}&nbsp;
+                                                <div id="trace_{{ 0 ~ '_' ~ i }}" class="trace">
+                                                    {{ trace.file|file_excerpt(trace.line) }}
+                                                </div>
+                                            {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ol>
+                                {% endfor %}
                             </div>
                         </td>
                     </tr>
@@ -382,7 +384,41 @@
                         <td style="height: 20px;"></td>
                     </tr>
                 </table>
+                {% if context is defined %}
+                    {#-- Variables Parameters Block --#}
+                    <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                        <tr>
+                            <td>
+                                <h4>Scope Variables</h4>
 
+                                {% if context|length %}
+                                    <table>
+                                        <tr>
+                                            <th>Variable</th>
+                                            <th>Value</th>
+                                        </tr>
+                                        {% for key, value in context %}
+                                            <tr>
+                                                <th style="border-top: 1px solid #999; vertical-align: top;"><pre>${{ key }} =</pre></th>
+                                                <td style="border-top: 1px solid #999">{{ value|dumpy(2) }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                {% else %}
+                                    <p>
+                                        <em>No variables captured</em>
+                                    </p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table>
+                        <tr>
+                            <td style="height: 20px;"></td>
+                        </tr>
+                    </table>
+                {% endif %}
                 {#-- Request GET Parameters Block --#}
                 <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
                     <tr>
