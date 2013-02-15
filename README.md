@@ -1,5 +1,7 @@
 # Elao ErrorNotifier Bundle
 
+[![knpbundles.com](http://knpbundles.com/Elao/ErrorNotifierBundle/badge)](http://knpbundles.com/Elao/ErrorNotifierBundle)
+
 ## What is it ?
 
 This bundle sends an email each time there is a 500 error on the production server. (It also can send an email for 404).
@@ -7,7 +9,6 @@ This bundle sends an email each time there is a 500 error on the production serv
 The email contains a lot of informations :
 
 ![Email ErrorNotifier Bundle](http://i48.tinypic.com/2en7xv4.png "Email ErrorNotifier Bundle")
-
 
 
 ## Installation
