@@ -223,7 +223,7 @@ class Notifier
             'context'         => $context
         ));
         
-        $subject = '[' . $request->headers->get('host') . '] Error' . $exception->getCode() . ' ' . $exception->getMessage();
+        $subject = '[' . $request->headers->get('host') . '] Error ' . $exception->getCode() . ' ' . $exception->getMessage();
 
         $mail = \Swift_Message::newInstance()
             ->setSubject($subject)
