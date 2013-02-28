@@ -221,12 +221,13 @@ class Notifier
             'exception_class' => get_class($exception),
             'request'         => $request,
             'status_code'     => $exception->getCode(),
-            // This is probably too dangerous as it could contain recursive objects
             'context'         => $context
         ));
+        
+        $subject = '[' . $request->headers->get('host') . '] Error' . $exception->getCode() . ' ' . $exception->getMessage();
 
         $mail = \Swift_Message::newInstance()
-            ->setSubject('[' . $request->headers->get('host') . '] Error')
+            ->setSubject($subject)
             ->setFrom($this->from)
             ->setTo($this->to)
             ->setContentType('text/html')
