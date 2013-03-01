@@ -223,8 +223,14 @@ class Notifier
             'context'         => $context
         ));
         
-        $subject = '[' . $request->headers->get('host') . '] Error ' . $exception->getCode() . ' ' . $exception->getMessage();
+        $subject = '[' . $request->headers->get('host') . '] Error ' . $exception->getCode() . ': ' . $exception->getMessage();
 
+        if(function_exists('mb_substr')) {
+            $subject = mb_substr($subject, 0, 255);
+        }else {
+            $subject = substr($subject, 0, 255);
+        }
+        
         $mail = \Swift_Message::newInstance()
             ->setSubject($subject)
             ->setFrom($this->from)
