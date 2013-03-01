@@ -304,7 +304,7 @@
                                         <div class="text_exception">
                                             <h1>{{ exception.message }}</h1>
                                             <div>
-                                                <strong>{{ status_code }}</strong> - {{ exception_class|abbr_class }}
+                                                <strong>{{ status_code }}</strong> - {{ exception.class|abbr_class }}
                                             </div>
                                             <!--<div class="linked"><span><strong>1</strong> linked Exception:</span>
                                                     <ul>
@@ -327,7 +327,7 @@
                         <td>
                             <h4>Information:</h4>
                             <strong>Generated at: </strong> {{ "now"|date("d-m-Y H:i:s") }} <br />
-                            <strong>Class name: </strong> {{ exception_class }} <br />
+                            <strong>Class name: </strong> {{ exception.class }} <br />
                             <strong>Message: </strong> {{ exception.message }} <br />
                             <strong>Uri: </strong> {{ request.uri }} <br />
                         </td>

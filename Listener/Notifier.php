@@ -218,15 +218,21 @@ class Notifier
         
         $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
             'exception'       => $exception,
-            'exception_class' => get_class($exception),
             'request'         => $request,
             'status_code'     => $exception->getCode(),
-            // This is probably too dangerous as it could contain recursive objects
             'context'         => $context
         ));
+        
+        $subject = '[' . $request->headers->get('host') . '] Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
 
+        if(function_exists('mb_substr')) {
+            $subject = mb_substr($subject, 0, 255);
+        }else {
+            $subject = substr($subject, 0, 255);
+        }
+        
         $mail = \Swift_Message::newInstance()
-            ->setSubject('[' . $request->headers->get('host') . '] Error')
+            ->setSubject($subject)
             ->setFrom($this->from)
             ->setTo($this->to)
             ->setContentType('text/html')
