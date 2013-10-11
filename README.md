@@ -71,19 +71,26 @@ elao_error_notifier:
 
 
 The mailer option has been added to let the application send the error mail via local smtp instead of using the regular quota on 3rd mailer services.
-For example, if you wish to use an custom mailer that send mails via your server mail transport, create this service in the `services.xml` of your bundle :
-```xml
-<!-- src/AcmeBundle/Resources/config/services.xml -->
-<service id="error.mailer" class="Swift_Mailer" public="true">
-    <argument type="service" id="swiftmailer.transport.mail" />
-</service>
+For example, if you wish to use an custom mailer that send mails via your server mail transport, create this one in the `config.yml` of your project:
+```yml
+# app/config/config.yml
+swiftmailer:
+    default_mailer: default
+    mailers:
+        default:
+            transport: smtp
+            host: localhost
+            username: mylogin
+            password: mypassword
+        notifier:
+            transport: mail
 ```
 
 And after just change the `mailer` key on your `config_prod.yml` :
 ```yml
 # app/config/config_prod.yml
 elao_error_notifier:
-    mailer: error.mailer
+    mailer: swiftmailer.mailer.notifier
 ```
 
 ## Twig Extension
