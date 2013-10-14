@@ -42,6 +42,7 @@ class DumpyTwigFilter extends \Twig_Extension
     public function getFilters()
     {
         $optionsForRaw = array('is_safe' => array('all')); // allows raw dumping (otherwise <pre> is encoded)
+
         return array(
             'pre'   => new \Twig_Filter_Method($this, 'pre', $optionsForRaw),
             'dump'  => new \Twig_Filter_Method($this, 'preDump', $optionsForRaw),
@@ -51,8 +52,9 @@ class DumpyTwigFilter extends \Twig_Extension
 
     public function pre($stringable)
     {
-        return "<pre>" . (string)$stringable . "</pre>";
+        return "<pre>" . (string) $stringable . "</pre>";
     }
+
     public function preDump($values)
     {
         return $this->pre(print_r($values, 1));
@@ -67,7 +69,7 @@ class DumpyTwigFilter extends \Twig_Extension
      * Encodes as YAML the passed $input
      *
      * @param $input
-     * @param int $inline
+     * @param  int   $inline
      * @return mixed
      */
     public function encode($input, $inline = self::INLINE)
@@ -84,8 +86,8 @@ class DumpyTwigFilter extends \Twig_Extension
     /**
      * Returns a templating-helper dump of depth-sanitized var as yaml string
      *
-     * @param mixed $value  What to dump
-     * @param int $depth    Recursion max depth
+     * @param  mixed  $value What to dump
+     * @param  int    $depth Recursion max depth
      * @return string
      */
     public function yamlDump($value, $depth = self::MAX_DEPTH)
@@ -99,8 +101,8 @@ class DumpyTwigFilter extends \Twig_Extension
      * A bit dirty as this should be in another Class, but hey
      *
      * @param $value
-     * @param int $maxRecursionDepth  The maximum depth of recursion
-     * @param int $recursionDepth     The depth of recursion (used internally)
+     * @param  int          $maxRecursionDepth The maximum depth of recursion
+     * @param  int          $recursionDepth    The depth of recursion (used internally)
      * @return array|string
      */
     public function sanitize ($value, $maxRecursionDepth = self::MAX_DEPTH, $recursionDepth = 0)
@@ -112,7 +114,7 @@ class DumpyTwigFilter extends \Twig_Extension
         if (is_array($value)) {
             return $this->sanitizeIterateable ($value, $maxRecursionDepth, $recursionDepth);
         }
-        
+
         if ($value instanceof InvokerException) {
             return $value->getMessage();
         }
@@ -139,6 +141,7 @@ class DumpyTwigFilter extends \Twig_Extension
                 if ($value instanceof \DateTime) {
                     $classInfo .= ' : ' . $value->format('Y-m-d H:i:s');
                 }
+
                 return $classInfo;
 
             } else { // Get all accessors and their values
@@ -159,10 +162,10 @@ class DumpyTwigFilter extends \Twig_Extension
                                 try {
                                     $methodValue = $method->invoke($value);
                                     $data['accessors'][$methodInfo] = $this->sanitize($methodValue, $maxRecursionDepth, $recursionDepth + 1);
-                                }catch(\Exception $e) {
+                                } catch (\Exception $e) {
                                     $data['accessors'][$methodInfo] = $this->sanitize(new InvokerException('Couldn\'t invoke method: Exception "' . get_class($e) . '" with message "' . $e->getMessage() . '"'), $maxRecursionDepth, $recursionDepth + 1);
                                 }
-                                
+
                             } else { // Get only method name and its params
                                 $data['accessors'][] = $methodInfo;
                             }
@@ -174,32 +177,27 @@ class DumpyTwigFilter extends \Twig_Extension
                 return $data;
             }
         }
-        
-        if(is_string($value))
-        {
+
+        if (is_string($value)) {
             $value = '(string) '.$value;
         }
-        
-        if(is_int($value))
-        {
+
+        if (is_int($value)) {
             $value = '(int) '.$value;
         }
-        
-        if(is_float($value))
-        {
+
+        if (is_float($value)) {
             $value = '(float) '.$value;
         }
-        
-        if(is_null($value))
-        {
+
+        if (is_null($value)) {
             $value = 'null';
         }
-        
-        if(is_bool($value))
-        {
-            if($value) {
+
+        if (is_bool($value)) {
+            if ($value) {
                 $value = '(bool) true';
-            }else {
+            } else {
                 $value = '(bool) false';
             }
         }
@@ -214,9 +212,11 @@ class DumpyTwigFilter extends \Twig_Extension
             foreach ($value as $k => $v) {
                 $r[$k] = $this->sanitize($v, $maxRecursionDepth, $recursionDepth + 1);
             }
+
             return $r;
         } else {
             $c = count($value); $t = gettype($value);
+
             return $c ? "$t of $c" : "empty $t";
         }
     }

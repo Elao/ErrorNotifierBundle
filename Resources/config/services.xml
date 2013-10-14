@@ -20,7 +20,7 @@
             <argument>%elao.error_notifier.handlePHPErrors%</argument> <!-- handle 404 error ? -->
             <argument>%elao.error_notifier.handlePHPWarnings%</argument> <!-- handle 404 error ? -->
         </service>
-        
+
         <service id="elao.error_notifier.dumpy_extension" class="Elao\ErrorNotifierBundle\Twig\DumpyTwigFilter">
             <tag name="twig.extension" />
         </service>

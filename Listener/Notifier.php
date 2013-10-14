@@ -27,37 +27,31 @@ class Notifier
     private $templating;
 
     private $from;
-
     private $to;
-
-    private $handle404;
-
-    private $reportWarnings = false;
-    private $reportErrors = false;
-
     private $request;
+    private $handle404;
+    private $reportWarnings = false;
+    private $reportErrors   = false;
 
     private static $tmpBuffer = null;
 
     /**
-     * __construct
+     * The constructor
      *
-     * @param Swift_Mailer    $mailer     mailer
-     * @param EngineInterface $templating templating
-     * @param string          $from       send mail from
-     * @param string          $to         send mail to
-     * @param boolean         $handle404  handle 404 error ?
+     * @param Swift_Mailer    $mailer       mailer
+     * @param EngineInterface $templating   templating
+     * @param string          $from         send mail from
+     * @param string          $to           send mail to
+     * @param boolean         $handle404    handle 404 error ?
      */
     public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false, $handlePHPErrors = false, $handlePHPWarnings = false)
     {
-        $this->mailer = $mailer;
-        $this->templating = $templating;
-
-        $this->from = $from;
-        $this->to = $to;
-        $this->handle404 = $handle404;
-
-        $this->reportErrors = $handlePHPErrors;
+        $this->mailer         = $mailer;
+        $this->templating     = $templating;
+        $this->from           = $from;
+        $this->to             = $to;
+        $this->handle404      = $handle404;
+        $this->reportErrors   = $handlePHPErrors;
         $this->reportWarnings = $handlePHPWarnings;
     }
 
@@ -82,7 +76,6 @@ class Notifier
             $this->createMailAndSend($exception, $event->getRequest());
         }
     }
-
     /**
      * Once we have the request we can use it to show debug details in the email
      *
@@ -95,7 +88,6 @@ class Notifier
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-
         if ($this->reportErrors || $this->reportWarnings) {
             self::_reserveMemory();
 
@@ -111,12 +103,11 @@ class Notifier
             // That is we need to use also register_shutdown_function()
             register_shutdown_function(array($this, 'handlePhpFatalErrorAndWarnings'));
         }
-
     }
 
     /**
-     *
      * @see http://php.net/set_error_handler
+     *
      * @param integer $level
      * @param string  $message
      * @param string  $file
@@ -126,7 +117,6 @@ class Notifier
      */
     public function handlePhpError($level, $message, $file, $line, $errcontext)
     {
-
         // there would be more warning codes but they are not caught by set_error_handler
         // but by register_shutdown_function
         $warningsCodes = array(E_NOTICE, E_USER_WARNING, E_USER_NOTICE, E_STRICT, E_DEPRECATED, E_USER_DEPRECATED);
@@ -139,7 +129,8 @@ class Notifier
 
         $this->createMailAndSend($exception, $this->request, $errcontext);
 
-        return false; // in order not to bypass the standard PHP error handler
+        // in order not to bypass the standard PHP error handler
+        return false;
     }
 
     /**
@@ -151,8 +142,10 @@ class Notifier
         self::_freeMemory();
 
         $lastError = error_get_last();
-        if (is_null($lastError))
+
+        if (is_null($lastError)) {
             return;
+        }
 
         $errors = array();
 
@@ -180,7 +173,6 @@ class Notifier
     {
         // may be exhaustive, but not sure
         $errorStrings = array(
-
             E_WARNING           => 'Warning',
             E_NOTICE            => 'Notice',
             E_USER_ERROR        => 'User Error',
@@ -190,47 +182,43 @@ class Notifier
             E_RECOVERABLE_ERROR => 'Catchable Fatal Error',
             E_DEPRECATED        => 'Deprecated',
             E_USER_DEPRECATED   => 'User Deprecated',
-
-            E_ERROR => 'Error',
-            E_PARSE => 'Parse Error',
-            E_CORE_ERROR => 'E_CORE_ERROR',
-            E_COMPILE_ERROR => 'E_COMPILE_ERROR',
-            E_CORE_WARNING => 'E_CORE_WARNING',
-            E_COMPILE_WARNING => 'E_COMPILE_WARNING',
+            E_ERROR             => 'Error',
+            E_PARSE             => 'Parse Error',
+            E_CORE_ERROR        => 'E_CORE_ERROR',
+            E_COMPILE_ERROR     => 'E_COMPILE_ERROR',
+            E_CORE_WARNING      => 'E_CORE_WARNING',
+            E_COMPILE_WARNING   => 'E_COMPILE_WARNING',
         );
 
         return array_key_exists($errorNo, $errorStrings) ? $errorStrings[$errorNo] : 'UNKNOWN';
-
     }
 
     /**
-     *
      * @param ErrorException $exception
      * @param Request        $request
      * @param array          $context
      */
     public function createMailAndSend($exception, $request, $context = null)
     {
-
         if (!$exception instanceof FlattenException) {
             $exception = FlattenException::create($exception);
         }
-        
+
         $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
             'exception'       => $exception,
             'request'         => $request,
             'status_code'     => $exception->getCode(),
             'context'         => $context
         ));
-        
+
         $subject = '[' . $request->headers->get('host') . '] Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
 
-        if(function_exists('mb_substr')) {
+        if (function_exists('mb_substr')) {
             $subject = mb_substr($subject, 0, 255);
-        }else {
+        } else {
             $subject = substr($subject, 0, 255);
         }
-        
+
         $mail = \Swift_Message::newInstance()
             ->setSubject($subject)
             ->setFrom($this->from)
@@ -239,7 +227,6 @@ class Notifier
             ->setBody($body);
 
         $this->mailer->send($mail);
-
     }
 
     /**
