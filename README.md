@@ -104,6 +104,18 @@ elao_error_notifier:
         - ...
 ```
 
+### How to ignore errors raised by given classes ?
+
+Sometimes, you want the bundle not to send email for errors raised by a given class. You can now do it by adding the name of the class raising the error in the `ignored_class` key.
+
+```yml
+# app/config/config_prod.yml
+elao_error_notifier:
+    ignored_classes:
+        - "Guzzle\Http\Exception\ServerErrorResponseException"
+        - ...
+```
+
 ## Twig Extension
 
 There are also some extensions that you can use in your Twig templates (thanks to [Goutte](https://github.com/Goutte))
