@@ -30,6 +30,7 @@ class Notifier
     private $to;
     private $request;
     private $handle404;
+    private $ignoredClasses;
     private $reportWarnings = false;
     private $reportErrors   = false;
 
@@ -38,13 +39,14 @@ class Notifier
     /**
      * The constructor
      *
-     * @param Swift_Mailer    $mailer       mailer
-     * @param EngineInterface $templating   templating
-     * @param string          $from         send mail from
-     * @param string          $to           send mail to
-     * @param boolean         $handle404    handle 404 error ?
+     * @param Swift_Mailer    $mailer         mailer
+     * @param EngineInterface $templating     templating
+     * @param string          $from           send mail from
+     * @param string          $to             send mail to
+     * @param boolean         $handle404      handle 404 error ?
+     * @param array           $ignoredClasses array of classes which will not trigger the email sending
      */
-    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false, $handlePHPErrors = false, $handlePHPWarnings = false)
+    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false, $handlePHPErrors = false, $handlePHPWarnings = false, $ignoredClasses = array())
     {
         $this->mailer         = $mailer;
         $this->templating     = $templating;
@@ -53,6 +55,7 @@ class Notifier
         $this->handle404      = $handle404;
         $this->reportErrors   = $handlePHPErrors;
         $this->reportWarnings = $handlePHPWarnings;
+        $this->ignoredClasses = $ignoredClasses;
     }
 
     /**
@@ -73,9 +76,20 @@ class Notifier
                 $this->createMailAndSend($exception, $event->getRequest());
             }
         } else {
-            $this->createMailAndSend($exception, $event->getRequest());
+            $sendMail = true;
+
+            foreach ($this->ignoredClasses as $ignoredClass) {
+                if (get_class($exception) == $ignoredClass) {
+                    $sendMail = false;
+                }
+            }
+
+            if ($sendMail === true) {
+                $this->createMailAndSend($exception, $event->getRequest());
+            }
         }
     }
+
     /**
      * Once we have the request we can use it to show debug details in the email
      *

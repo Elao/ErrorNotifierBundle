@@ -6,9 +6,7 @@
 
 This bundle sends an email each time there is a 500 error on the production server. You can also be notified of 404 or PHP fatal errors.
 
-The email contains a lot of information :
-
-![Email ErrorNotifier Bundle](http://i49.tinypic.com/2wck36e.png "Email ErrorNotifier Bundle")
+The email contains a lot of information : see the screenshot at the end of the README.
 
 ## Installation
 
@@ -66,10 +64,23 @@ elao_error_notifier:
     mailer: your.mailer.id # default : mailer
     handlePHPErrors: true # catch fatal erros and email them
     handlePHPWarnings: true # catch warnings and email them
+    ignored_classes: ~
 ```
 
-
+### How to setup another mailer for sending the error mail
 The mailer option has been added to let the application send the error mail via local smtp instead of using the regular quota on 3rd mailer services.
+
+### How to ignore errors raised by given classes ?
+
+Sometimes, you want the bundle not to send email for errors raised by a given class. You can now do it by adding the name of the class raising the error in the `ignored_class` key.
+
+```yml
+# app/config/config_prod.yml
+elao_error_notifier:
+    ignored_classes:
+        - "Guzzle\Http\Exception\ServerErrorResponseException"
+        - ...
+```
 
 ## Twig Extension
 
@@ -94,3 +105,9 @@ You may control the depth of recursion with a parameter, say foo = array('a'=>ar
                                    - d
 
 Default value is 1. (MAX_DEPTH const)
+
+
+## Screenshot
+
+![Email ErrorNotifier Bundle](http://i49.tinypic.com/2wck36e.png "Email ErrorNotifier Bundle")
+

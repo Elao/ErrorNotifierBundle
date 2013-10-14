@@ -24,15 +24,30 @@ class Configuration implements ConfigurationInterface
 
         $root
             ->children()
-                ->scalarNode('to')->cannotBeEmpty()->end()
-                ->scalarNode('from')->cannotBeEmpty()->end()
-                ->booleanNode('handle404')->defaultValue(false)->end()
-                ->scalarNode('mailer')->defaultValue('mailer')->end()
-                ->booleanNode('handlePHPWarnings')->defaultValue(false)->end()
-                ->booleanNode('handlePHPErrors')->defaultValue(false)->end()
+                ->scalarNode('to')
+                    ->cannotBeEmpty()
+                ->end()
+                ->scalarNode('from')
+                    ->cannotBeEmpty()
+                ->end()
+                ->booleanNode('handle404')
+                    ->defaultValue(false)
+                ->end()
+                ->scalarNode('mailer')
+                    ->defaultValue('mailer')
+                ->end()
+                ->booleanNode('handlePHPWarnings')
+                    ->defaultValue(false)
+                ->end()
+                ->booleanNode('handlePHPErrors')
+                    ->defaultValue(false)
+                ->end()
+                ->arrayNode('ignored_classes')
+                    ->prototype('scalar')
+                    ->treatNullLike(array())
+                ->end()
             ->end();
 
         return $treeBuilder;
     }
-
 }

@@ -19,6 +19,7 @@
             <argument>%elao.error_notifier.handle404%</argument> <!-- handle 404 error ? -->
             <argument>%elao.error_notifier.handlePHPErrors%</argument> <!-- handle 404 error ? -->
             <argument>%elao.error_notifier.handlePHPWarnings%</argument> <!-- handle 404 error ? -->
+            <argument>%elao.error_notifier.ignored_classes%</argument> <!-- eventual ignored class that won't trigger the email sending -->
         </service>
 
         <service id="elao.error_notifier.dumpy_extension" class="Elao\ErrorNotifierBundle\Twig\DumpyTwigFilter">
