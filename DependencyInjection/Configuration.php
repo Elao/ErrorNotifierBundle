@@ -42,7 +42,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('handlePHPErrors')
                     ->defaultValue(false)
                 ->end()
-                ->arrayNode('ignored_classes')
+                ->arrayNode('ignoredClasses')
                     ->prototype('scalar')
                     ->treatNullLike(array())
                 ->end()

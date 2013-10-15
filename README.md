@@ -65,7 +65,7 @@ elao_error_notifier:
     mailer: your.mailer.id # default : mailer
     handlePHPErrors: true # catch fatal erros and email them
     handlePHPWarnings: true # catch warnings and email them
-    ignored_classes: ~
+    ignoredClasses: ~
 ```
 
 ### How to setup another mailer for sending the error mail
@@ -99,19 +99,7 @@ Sometimes, you want the bundle not to send email for errors raised by a given cl
 ```yml
 # app/config/config_prod.yml
 elao_error_notifier:
-    ignored_classes:
-        - "Guzzle\Http\Exception\ServerErrorResponseException"
-        - ...
-```
-
-### How to ignore errors raised by given classes ?
-
-Sometimes, you want the bundle not to send email for errors raised by a given class. You can now do it by adding the name of the class raising the error in the `ignored_class` key.
-
-```yml
-# app/config/config_prod.yml
-elao_error_notifier:
-    ignored_classes:
+    ignoredClasses:
         - "Guzzle\Http\Exception\ServerErrorResponseException"
         - ...
 ```
