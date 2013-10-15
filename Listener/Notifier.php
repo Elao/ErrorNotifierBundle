@@ -76,7 +76,7 @@ class Notifier
                 $this->createMailAndSend($exception, $event->getRequest());
             }
         } else {
-            $sendMail = (in_array(get_class($exception), $this->ignoredClasses)) ? false : true;
+            $sendMail = (!in_array(get_class($exception), $this->ignoredClasses));
 
             if ($sendMail === true) {
                 $this->createMailAndSend($exception, $event->getRequest());
