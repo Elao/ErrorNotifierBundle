@@ -446,7 +446,7 @@
                             <h4>Request POST Parameters</h4>
 
                             {% if request.request.all|length %}
-                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.query } only %}
+                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.request } only %}
                             {% else %}
                                 <p>
                                     <em>No POST parameters</em>
@@ -469,7 +469,7 @@
                             <h4>Request Attributes</h4>
 
                             {% if request.attributes.all|length %}
-                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.query } only %}
+                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.attributes } only %}
                             {% else %}
                                 <p>
                                     <em>No Request Attributes</em>
@@ -492,7 +492,7 @@
                             <h4>Request Cookies</h4>
 
                             {% if request.cookies.all|length %}
-                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.query } only %}
+                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.cookies } only %}
                             {% else %}
                                 <p>
                                     <em>No Request Cookies</em>
