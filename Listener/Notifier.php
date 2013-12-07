@@ -2,6 +2,7 @@
 
 namespace Elao\ErrorNotifierBundle\Listener;
 
+use Doctrine\ORM\Tools\Export\ExportException;
 use \Swift_Mailer;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -26,6 +27,11 @@ class Notifier
      */
     private $templating;
 
+    /**
+     * @var string
+     */
+    private $errorsDir;
+
     private $from;
     private $to;
     private $request;
@@ -33,6 +39,7 @@ class Notifier
     private $ignoredClasses;
     private $reportWarnings = false;
     private $reportErrors   = false;
+    private $repeatTimeout  = false;
 
     private static $tmpBuffer = null;
 
@@ -46,16 +53,20 @@ class Notifier
      * @param boolean         $handle404      handle 404 error ?
      * @param array           $ignoredClasses array of classes which will not trigger the email sending
      */
-    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false, $handlePHPErrors = false, $handlePHPWarnings = false, $ignoredClasses = array())
+    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $cacheDir, $from, $to, $handle404 = false, $handlePHPErrors = false, $handlePHPWarnings = false, $ignoredClasses = array(), $repeatTimeout = false)
     {
         $this->mailer         = $mailer;
         $this->templating     = $templating;
+        $this->errorsDir      = $cacheDir.'/errors';
+        if (!is_dir($this->errorsDir))
+            mkdir($this->errorsDir);
         $this->from           = $from;
         $this->to             = $to;
         $this->handle404      = $handle404;
         $this->reportErrors   = $handlePHPErrors;
         $this->reportWarnings = $handlePHPWarnings;
         $this->ignoredClasses = $ignoredClasses;
+        $this->repeatTimeout  = $repeatTimeout;
     }
 
     /**
@@ -211,6 +222,9 @@ class Notifier
         if (!$exception instanceof FlattenException) {
             $exception = FlattenException::create($exception);
         }
+        if ($this->repeatTimeout && $this->checkRepeat($exception)) {
+            return;
+        }
 
         $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
             'exception'       => $exception,
@@ -235,6 +249,25 @@ class Notifier
             ->setBody($body);
 
         $this->mailer->send($mail);
+    }
+
+    /**
+     * Check last send time
+     *
+     * @param FlattenException $exception
+     * @return bool
+     */
+    private function checkRepeat(FlattenException $exception)
+    {
+        $key = md5($exception->getMessage().':'.$exception->getLine().':'.$exception->getFile());
+        $file = $this->errorsDir.'/'.$key;
+        $time = is_file($file) ? file_get_contents($file) : 0;
+        if ($time < time())
+        {
+            file_put_contents($file, time() + $this->repeatTimeout);
+            return false;
+        }
+        return true;
     }
 
     /**
