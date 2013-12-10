@@ -106,7 +106,7 @@ elao_error_notifier:
 
 ### How to avoid sending many same messages for one error ?
 
-If an error occurs on a website whith a lot of active visitors you'll get spammed by the notifier for the same error.
+If an error occurs on a website with a lot of active visitors you'll get spammed by the notifier for the same error.
 
 In order to avoid getting spammed, use the `repeatTimeout` option.
 
