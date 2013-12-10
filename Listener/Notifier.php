@@ -2,7 +2,6 @@
 
 namespace Elao\ErrorNotifierBundle\Listener;
 
-use Doctrine\ORM\Tools\Export\ExportException;
 use \Swift_Mailer;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -254,7 +253,7 @@ class Notifier
     /**
      * Check last send time
      *
-     * @param FlattenException $exception
+     * @param  FlattenException $exception
      * @return bool
      */
     private function checkRepeat(FlattenException $exception)
@@ -262,11 +261,12 @@ class Notifier
         $key = md5($exception->getMessage().':'.$exception->getLine().':'.$exception->getFile());
         $file = $this->errorsDir.'/'.$key;
         $time = is_file($file) ? file_get_contents($file) : 0;
-        if ($time < time())
-        {
+        if ($time < time()) {
             file_put_contents($file, time() + $this->repeatTimeout);
+
             return false;
         }
+
         return true;
     }
 
