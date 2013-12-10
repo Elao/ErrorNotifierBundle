@@ -104,6 +104,19 @@ elao_error_notifier:
         - ...
 ```
 
+### How to avoid sending many same messages for one error ?
+
+If exept error on site whis many users or in cycle you may found very many messages whis same error.
+
+Use option `repeatTimeout` for not send repeat messages for one error.
+```yml
+# app/config/config_prod.yml
+elao_error_notifier:
+    repeatTimeout: 3600
+```
+
+In this example mail for error will not be send if same error exept less hour ago.
+
 ## Twig Extension
 
 There are also some extensions that you can use in your Twig templates (thanks to [Goutte](https://github.com/Goutte))

@@ -36,6 +36,7 @@ class ElaoErrorNotifierExtension extends Extension
             $container->setParameter('elao.error_notifier.handlePHPErrors', $config['handlePHPErrors']);
             $container->setParameter('elao.error_notifier.handlePHPWarnings', $config['handlePHPWarnings']);
             $container->setParameter('elao.error_notifier.ignored_classes', $config['ignoredClasses']);
+            $container->setParameter('elao.error_notifier.repeatTimeout', $config['repeatTimeout']);
 
             $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config/')));
             $loader->load('services.xml');
