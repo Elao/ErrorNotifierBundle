@@ -14,7 +14,6 @@
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="0"/>
             <argument type="service" id="mailer" />
             <argument type="service" id="templating" />
-            <argument>%kernel.cache_dir%</argument>
             <argument>%elao.error_notifier.from%</argument> <!-- send mail from ? -->
             <argument>%elao.error_notifier.to%</argument> <!-- send mail to ? -->
             <argument>%elao.error_notifier.handle404%</argument> <!-- handle 404 error ? -->
@@ -22,6 +21,7 @@
             <argument>%elao.error_notifier.handlePHPWarnings%</argument> <!-- handle 404 error ? -->
             <argument>%elao.error_notifier.ignored_classes%</argument> <!-- eventual ignored class that won't trigger the email sending -->
             <argument>%elao.error_notifier.repeatTimeout%</argument> <!-- not send email for some time -->
+            <argument>%kernel.cache_dir%</argument>
         </service>
 
         <service id="elao.error_notifier.dumpy_extension" class="Elao\ErrorNotifierBundle\Twig\DumpyTwigFilter">

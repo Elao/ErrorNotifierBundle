@@ -52,13 +52,10 @@ class Notifier
      * @param boolean         $handle404      handle 404 error ?
      * @param array           $ignoredClasses array of classes which will not trigger the email sending
      */
-    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $cacheDir, $from, $to, $handle404 = false, $handlePHPErrors = false, $handlePHPWarnings = false, $ignoredClasses = array(), $repeatTimeout = false)
+    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false, $handlePHPErrors = false, $handlePHPWarnings = false, $ignoredClasses = array(), $repeatTimeout = false, $cacheDir = false)
     {
         $this->mailer         = $mailer;
         $this->templating     = $templating;
-        $this->errorsDir      = $cacheDir.'/errors';
-        if (!is_dir($this->errorsDir))
-            mkdir($this->errorsDir);
         $this->from           = $from;
         $this->to             = $to;
         $this->handle404      = $handle404;
@@ -66,6 +63,9 @@ class Notifier
         $this->reportWarnings = $handlePHPWarnings;
         $this->ignoredClasses = $ignoredClasses;
         $this->repeatTimeout  = $repeatTimeout;
+        $this->errorsDir      = $cacheDir.'/errors';
+        if (!is_dir($this->errorsDir))
+            mkdir($this->errorsDir);
     }
 
     /**
