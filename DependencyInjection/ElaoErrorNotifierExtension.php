@@ -30,13 +30,7 @@ class ElaoErrorNotifierExtension extends Extension
         if (count($configs[0])) {
             $config = $this->processConfiguration($configuration, $configs);
 
-            $container->setParameter('elao.error_notifier.from', $config['from']);
-            $container->setParameter('elao.error_notifier.to', $config['to']);
-            $container->setParameter('elao.error_notifier.handle404', $config['handle404']);
-            $container->setParameter('elao.error_notifier.handlePHPErrors', $config['handlePHPErrors']);
-            $container->setParameter('elao.error_notifier.handlePHPWarnings', $config['handlePHPWarnings']);
-            $container->setParameter('elao.error_notifier.ignored_classes', $config['ignoredClasses']);
-            $container->setParameter('elao.error_notifier.repeatTimeout', $config['repeatTimeout']);
+            $container->setParameter('elao.error_notifier.config', $config);
 
             $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config/')));
             $loader->load('services.xml');
