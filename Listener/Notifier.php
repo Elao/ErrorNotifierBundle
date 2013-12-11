@@ -62,8 +62,10 @@ class Notifier
         $this->ignoredClasses = $config['ignoredClasses'];
         $this->repeatTimeout  = $config['repeatTimeout'];
         $this->errorsDir      = $cacheDir.'/errors';
-        if (!is_dir($this->errorsDir))
+        
+        if (!is_dir($this->errorsDir)) {
             mkdir($this->errorsDir);
+        }
     }
 
     /**
