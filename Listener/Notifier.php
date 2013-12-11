@@ -45,24 +45,22 @@ class Notifier
     /**
      * The constructor
      *
-     * @param Swift_Mailer    $mailer         mailer
-     * @param EngineInterface $templating     templating
-     * @param string          $from           send mail from
-     * @param string          $to             send mail to
-     * @param boolean         $handle404      handle 404 error ?
-     * @param array           $ignoredClasses array of classes which will not trigger the email sending
+     * @param Swift_Mailer    $mailer     mailer
+     * @param EngineInterface $templating templating
+     * @param string          $cacheDir   cacheDir
+     * @param array           $config     configure array
      */
-    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $from, $to, $handle404 = false, $handlePHPErrors = false, $handlePHPWarnings = false, $ignoredClasses = array(), $repeatTimeout = false, $cacheDir = false)
+    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $cacheDir, $config)
     {
         $this->mailer         = $mailer;
         $this->templating     = $templating;
-        $this->from           = $from;
-        $this->to             = $to;
-        $this->handle404      = $handle404;
-        $this->reportErrors   = $handlePHPErrors;
-        $this->reportWarnings = $handlePHPWarnings;
-        $this->ignoredClasses = $ignoredClasses;
-        $this->repeatTimeout  = $repeatTimeout;
+        $this->from           = $config['from'];
+        $this->to             = $config['to'];
+        $this->handle404      = $config['handle404'];
+        $this->reportErrors   = $config['handlePHPErrors'];
+        $this->reportWarnings = $config['handlePHPWarnings'];
+        $this->ignoredClasses = $config['ignoredClasses'];
+        $this->repeatTimeout  = $config['repeatTimeout'];
         $this->errorsDir      = $cacheDir.'/errors';
         if (!is_dir($this->errorsDir))
             mkdir($this->errorsDir);
