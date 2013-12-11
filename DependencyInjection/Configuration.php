@@ -25,9 +25,11 @@ class Configuration implements ConfigurationInterface
         $root
             ->children()
                 ->scalarNode('to')
+                    ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
                 ->scalarNode('from')
+                    ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
                 ->booleanNode('handle404')
