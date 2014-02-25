@@ -24,7 +24,7 @@
  * @author Goutte
  */
 
-namespace Elao\ErrornotifierBundle\Twig;
+namespace Elao\ErrorNotifierBundle\Twig;
 
 use Symfony\Component\Yaml\Dumper as YamlDumper;
 use Elao\ErrorNotifierBundle\Exception\InvokerException;
