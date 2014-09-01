@@ -3,11 +3,16 @@
 namespace Elao\ErrorNotifierBundle\Listener;
 
 use \Swift_Mailer;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Console\Event\ConsoleExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 
 /**
@@ -39,6 +44,8 @@ class Notifier
     private $reportWarnings = false;
     private $reportErrors   = false;
     private $repeatTimeout  = false;
+    private $command;
+    private $commandInput;
 
     private static $tmpBuffer = null;
 
@@ -95,6 +102,24 @@ class Notifier
     }
 
     /**
+     * Handle the event
+     *
+     * @param ConsoleExceptionEvent $event event
+     */
+    public function onConsoleException(ConsoleExceptionEvent $event)
+    {
+
+        $exception = $event->getException();
+
+        $sendMail = !in_array(get_class($exception), $this->ignoredClasses);
+
+        if ($sendMail === true) {
+            $this->createMailAndSend($exception, null, null, $this->command, $this->commandInput);
+        }
+
+    }
+
+    /**
      * Once we have the request we can use it to show debug details in the email
      *
      * Ideally the handlers would be registered earlier on in the boot process
@@ -111,16 +136,41 @@ class Notifier
 
             $this->request = $event->getRequest();
 
-            // set_error_handler and register_shutdown_function can be triggered on
-            // both warnings and errors
-            set_error_handler(array($this, 'handlePhpError'), E_ALL);
-
-            // From PHP Documentation: the following error types cannot be handled with
-            // a user defined function using set_error_handler: *E_ERROR*, *E_PARSE*, *E_CORE_ERROR*, *E_CORE_WARNING*,
-            // *E_COMPILE_ERROR*, *E_COMPILE_WARNING*
-            // That is we need to use also register_shutdown_function()
-            register_shutdown_function(array($this, 'handlePhpFatalErrorAndWarnings'));
+            $this->setErrorHandlers();
         }
+    }
+
+    /**
+     * @param ConsoleCommandEvent $event
+     */
+    public function onConsoleCommand(ConsoleCommandEvent $event)
+    {
+
+        $this->request = null;
+
+        $this->command = $event->getCommand();
+        $this->commandInput = $event->getInput();
+
+        if ($this->reportErrors || $this->reportWarnings) {
+            self::_reserveMemory();
+
+            $this->setErrorHandlers();
+        }
+    }
+
+    protected function setErrorHandlers()
+    {
+        // set_error_handler and register_shutdown_function can be triggered on
+        // both warnings and errors
+        set_error_handler(array($this, 'handlePhpError'), E_ALL);
+
+        // From PHP Documentation: the following error types cannot be handled with
+        // a user defined function using set_error_handler: *E_ERROR*, *E_PARSE*, *E_CORE_ERROR*, *E_CORE_WARNING*,
+        // *E_COMPILE_ERROR*, *E_COMPILE_WARNING*
+        // That is we need to use also register_shutdown_function()
+        register_shutdown_function(array($this, 'handlePhpFatalErrorAndWarnings'));
+
+
     }
 
     /**
@@ -145,7 +195,7 @@ class Notifier
 
         $exception = new \ErrorException(sprintf('%s: %s in %s line %d', $this->getErrorString($level), $message, $file, $line), 0, $level, $file, $line);
 
-        $this->createMailAndSend($exception, $this->request, $errcontext);
+        $this->createMailAndSend($exception, $this->request, $errcontext, $this->command, $this->commandInput);
 
         // in order not to bypass the standard PHP error handler
         return false;
@@ -177,7 +227,7 @@ class Notifier
 
         if (in_array($lastError['type'], $errors)) {
             $exception = new \ErrorException(sprintf('%s: %s in %s line %d', @$this->getErrorString(@$lastError['type']), @$lastError['message'], @$lastError['file'], @$lastError['line']),  @$lastError['type'], @$lastError['type'], @$lastError['file'], @$lastError['line']);
-            $this->createMailAndSend($exception, $this->request);
+            $this->createMailAndSend($exception, $this->request, null, $this->command, $this->commandInput);
         }
     }
 
@@ -215,13 +265,15 @@ class Notifier
      * @param ErrorException $exception
      * @param Request        $request
      * @param array          $context
+     * @param Command        $command
+     * @param InputInterface $commandInput
      */
-    public function createMailAndSend($exception, $request, $context = null)
+    public function createMailAndSend($exception, Request $request = null, $context = null, Command $command = null, InputInterface $commandInput = null)
     {
         if (!$exception instanceof FlattenException) {
             $exception = FlattenException::create($exception);
         }
-        if ($this->repeatTimeout && $this->checkRepeat($exception)) {
+        if (false && $this->repeatTimeout && $this->checkRepeat($exception)) {
             return;
         }
 
@@ -229,10 +281,18 @@ class Notifier
             'exception'       => $exception,
             'request'         => $request,
             'status_code'     => $exception->getCode(),
-            'context'         => $context
+            'context'         => $context,
+            'command'         => $command,
+            'command_input'   => $commandInput
         ));
 
-        $subject = '[' . $request->headers->get('host') . '] Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
+        if($this->request) {
+            $subject = '[' . $request->headers->get('host') . '] Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
+        } elseif($this->command) {
+            $subject = '[' . $this->command->getName() . '] Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
+        } else {
+            $subject = 'Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
+        }
 
         if (function_exists('mb_substr')) {
             $subject = mb_substr($subject, 0, 255);
@@ -248,6 +308,7 @@ class Notifier
             ->setBody($body);
 
         $this->mailer->send($mail);
+
     }
 
     /**
