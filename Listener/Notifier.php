@@ -273,7 +273,7 @@ class Notifier
         if (!$exception instanceof FlattenException) {
             $exception = FlattenException::create($exception);
         }
-        if (false && $this->repeatTimeout && $this->checkRepeat($exception)) {
+        if ($this->repeatTimeout && $this->checkRepeat($exception)) {
             return;
         }
 
