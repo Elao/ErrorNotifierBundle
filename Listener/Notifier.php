@@ -108,7 +108,6 @@ class Notifier
      */
     public function onConsoleException(ConsoleExceptionEvent $event)
     {
-
         $exception = $event->getException();
 
         $sendMail = !in_array(get_class($exception), $this->ignoredClasses);
@@ -116,7 +115,6 @@ class Notifier
         if ($sendMail === true) {
             $this->createMailAndSend($exception, null, null, $this->command, $this->commandInput);
         }
-
     }
 
     /**
@@ -145,7 +143,6 @@ class Notifier
      */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
-
         $this->request = null;
 
         $this->command = $event->getCommand();
@@ -169,8 +166,6 @@ class Notifier
         // *E_COMPILE_ERROR*, *E_COMPILE_WARNING*
         // That is we need to use also register_shutdown_function()
         register_shutdown_function(array($this, 'handlePhpFatalErrorAndWarnings'));
-
-
     }
 
     /**
@@ -308,7 +303,6 @@ class Notifier
             ->setBody($body);
 
         $this->mailer->send($mail);
-
     }
 
     /**
