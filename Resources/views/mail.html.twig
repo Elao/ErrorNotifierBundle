@@ -326,7 +326,10 @@
                             <strong>Generated at: </strong> {{ "now"|date("d-m-Y H:i:s") }} <br />
                             <strong>Class name: </strong> {{ exception.class }} <br />
                             <strong>Message: </strong> {{ exception.message }} <br />
-                            <strong>Uri: </strong> {{ request.uri }} <br />
+                            {% if request %}<strong>Uri: </strong> {{ request.uri }} <br />{% endif %}
+                            {% if command %}
+                                <strong>Command:</strong> {{ command.name }}<br>
+                            {% endif %}
                         </td>
                     </tr>
                 </table>
@@ -381,6 +384,59 @@
                         <td style="height: 20px;"></td>
                     </tr>
                 </table>
+                {% if command_input %}
+                    {% if command_input.options|length %}
+                        {#-- Command Options Block --#}
+                        <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                            <tr>
+                                <td>
+                                    <h4>Command Options</h4>
+                                    <table>
+                                    <tr>
+                                        <th>Variable</th>
+                                        <th>Value</th>
+                                    </tr>
+                                    {% for key, value in command_input.options %}
+                                        <tr>
+                                            <th style="border-top: 1px solid #999; vertical-align: top;"><pre>{{ key }} =</pre></th>
+                                            <td style="border-top: 1px solid #999">{{ value|dumpy(2) }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                                </td>
+                            </tr>
+                        </table>
+                    {% endif %}
+                    {% if command_input.arguments|length %}
+                        {#-- Command Arguments Block --#}
+                        <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                            <tr>
+                                <td>
+
+                                    <h4>Command Arguments</h4>
+                                    <table>
+
+                                        <tr>
+                                            <th>Variable</th>
+                                            <th>Value</th>
+                                        </tr>
+                                        {% for key, value in command_input.arguments %}
+                                            <tr>
+                                                <th style="border-top: 1px solid #999; vertical-align: top;"><pre>{{ key }} =</pre></th>
+                                                <td style="border-top: 1px solid #999">{{ value|dumpy(2) }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    {% endif %}
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+                {% endif %}
                 {% if context is defined %}
                     {#-- Variables Parameters Block --#}
                     <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
@@ -416,6 +472,7 @@
                         </tr>
                     </table>
                 {% endif %}
+                {% if request %}
                 {#-- Request GET Parameters Block --#}
                 <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
                     <tr>
@@ -574,6 +631,7 @@
                         <td style="height: 20px;"></td>
                     </tr>
                 </table>
+        {% endif %}
 
             </div>
         </div>
