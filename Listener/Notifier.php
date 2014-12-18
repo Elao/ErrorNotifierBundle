@@ -43,6 +43,7 @@ class Notifier
     private $ignoredClasses;
     private $reportWarnings = false;
     private $reportErrors   = false;
+    private $reportSilent   = false;
     private $repeatTimeout  = false;
     private $command;
     private $commandInput;
@@ -66,10 +67,11 @@ class Notifier
         $this->handle404      = $config['handle404'];
         $this->reportErrors   = $config['handlePHPErrors'];
         $this->reportWarnings = $config['handlePHPWarnings'];
+        $this->reportSilent   = $config['handleSilentErrors'];
         $this->ignoredClasses = $config['ignoredClasses'];
         $this->repeatTimeout  = $config['repeatTimeout'];
         $this->errorsDir      = $cacheDir.'/errors';
-        
+
         if (!is_dir($this->errorsDir)) {
             mkdir($this->errorsDir);
         }
@@ -180,6 +182,11 @@ class Notifier
      */
     public function handlePhpError($level, $message, $file, $line, $errcontext)
     {
+        // don't catch error with error_repoting is 0
+        if (0 === error_reporting() && false === $this->reportSilent) {
+            return false;
+        }
+
         // there would be more warning codes but they are not caught by set_error_handler
         // but by register_shutdown_function
         $warningsCodes = array(E_NOTICE, E_USER_WARNING, E_USER_NOTICE, E_STRICT, E_DEPRECATED, E_USER_DEPRECATED);

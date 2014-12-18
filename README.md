@@ -65,6 +65,7 @@ elao_error_notifier:
     mailer: your.mailer.id # default : mailer
     handlePHPErrors: true # catch fatal erros and email them
     handlePHPWarnings: true # catch warnings and email them
+    handleSilentErrors: false # don't catch error on method with an @
     ignoredClasses: ~
 ```
 
