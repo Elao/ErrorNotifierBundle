@@ -278,9 +278,6 @@ class Notifier
         if ($this->repeatTimeout && $this->checkRepeat($exception)) {
             return;
         }
-        if(is_null($context)) {
-            $context = get_defined_vars();
-        }
 
         $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
             'exception'       => $exception,
