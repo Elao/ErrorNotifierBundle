@@ -209,10 +209,20 @@ class DumpyTwigFilter extends \Twig_Extension
     {
         if ($recursionDepth < $maxRecursionDepth) {
             $r = array ();
+            $arrayCount = count($value);
+
+            if($arrayCount > 20) {
+                $value = array_splice($value, 0, 20);
+            }
+
             foreach ($value as $k => $v) {
                 $r[$k] = $this->sanitize($v, $maxRecursionDepth, $recursionDepth + 1);
             }
 
+            if($arrayCount > 20) {
+                $r[] = sprintf('... and %s more ...', ($arrayCount - 20));
+            }
+            
             return $r;
         } else {
             $c = count($value); $t = gettype($value);
