@@ -208,19 +208,18 @@ class DumpyTwigFilter extends \Twig_Extension
     public function sanitizeIterateable ($value, $maxRecursionDepth = self::MAX_DEPTH, $recursionDepth = 0)
     {
         if ($recursionDepth < $maxRecursionDepth) {
+
             $r = array ();
             $arrayCount = count($value);
-
-            if($arrayCount > 20) {
-                $value = array_splice($value, 0, 20);
-            }
+            $count = 0;
 
             foreach ($value as $k => $v) {
                 $r[$k] = $this->sanitize($v, $maxRecursionDepth, $recursionDepth + 1);
-            }
-
-            if($arrayCount > 20) {
-                $r[] = sprintf('... and %s more ...', ($arrayCount - 20));
+                $count++;
+                if($count >= 20) {
+                    $r[] = sprintf('... and %s more ...', ($arrayCount - $count));
+                    break;
+                }
             }
             
             return $r;
