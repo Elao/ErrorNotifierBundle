@@ -10,15 +10,28 @@ use Symfony\Component\HttpFoundation\Request;
 interface ExceptionHandlerInterface
 {
     /**
+     * Set request object
+     *
      * @param Request $request
-     * @param Command $command
-     * @param InputInterface $commandInput
+     * @return $this
      */
-    public function initializeHandler(
-        Request $request = null,
-        Command $command = null,
-        InputInterface $commandInput = null
-    );
+    public function setRequest(Request $request);
+
+    /**
+     * Set command object
+     *
+     * @param Command $command
+     * @return $this
+     */
+    public function setCommand(Command $command);
+
+    /**
+     * Set command input object
+     *
+     * @param InputInterface $input
+     * @return $this
+     */
+    public function setCommandInput(InputInterface $input);
 
     /**
      * @see http://php.net/set_error_handler
@@ -43,7 +56,7 @@ interface ExceptionHandlerInterface
 
     /**
      * @param \Exception $exception
-     * @param Request $request
+     * @return null
      */
-    public function handleException(\Exception $exception, Request $request = null);
+    public function handleException(\Exception $exception);
 }

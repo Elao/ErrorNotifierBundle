@@ -6,8 +6,8 @@ use CL\Slack\Payload\ChatPostMessagePayload;
 use CL\Slack\Transport\ApiClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Templating\EngineInterface;
 
@@ -83,7 +83,7 @@ class SlackNotifier implements NotifierInterface
         $payload->setUsername(sprintf('%s (bot)', $this->getUsername($exception)));
         $payload->setIconEmoji('skull');
 
-        $response = $this->apiClient->send($payload);
+        $this->apiClient->send($payload);
     }
 
     /**

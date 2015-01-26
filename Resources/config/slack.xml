@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="elao.error_notifier.notifier.default_slack.class">Elao\ErrorNotifierBundle\Notifier\SlackNotifier</parameter>
+    </parameters>
+
+    <services>
+        <service id="elao.error_notifier.client.slack" class="CL\Slack\Transport\ApiClient">
+            <argument />   <!-- token -->
+        </service>
+
+        <service id="elao.error_notifier.notifier.default_slack" class="%elao.error_notifier.notifier.default_slack.class%">
+            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="templating" />
+            <argument />    <!-- channel -->
+            <argument type="service" id="elao.error_notifier.client.slack" on-invalid="null" />
+            <tag name="elao.error_notifier.notifier" alias="default_slack" />
+        </service>
+    </services>
+
+</container>

@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="elao.error_notifier.decision_manager.class">Elao\ErrorNotifierBundle\DecisionManagement\Manager\NotificationDecisionmanager</parameter>
+
+        <parameter key="elao.error_notifier.decider.client_ip.class">Elao\ErrorNotifierBundle\DecisionManagement\Voter\ClientIPVoter</parameter>
+        <parameter key="elao.error_notifier.decider.exception_class.class">Elao\ErrorNotifierBundle\DecisionManagement\Voter\ExceptionClassVoter</parameter>
+        <parameter key="elao.error_notifier.decider.http_code.class">Elao\ErrorNotifierBundle\DecisionManagement\Voter\HTTPCodeVoter</parameter>
+        <parameter key="elao.error_notifier.decider.php_error.class">Elao\ErrorNotifierBundle\DecisionManagement\Voter\PHPErrorVoter</parameter>
+        <parameter key="elao.error_notifier.decider.timeout.class">Elao\ErrorNotifierBundle\DecisionManagement\Voter\TimeoutVoter</parameter>
+        <parameter key="elao.error_notifier.decider.uri.class">Elao\ErrorNotifierBundle\DecisionManagement\Voter\URIVoter</parameter>
+        <parameter key="elao.error_notifier.decider.user_agent.class">Elao\ErrorNotifierBundle\DecisionManagement\UserAgentVoter\Voter</parameter>
+    </parameters>
+
+    <services>
+        <service id="elao.error_notifier.decision_manager" class="%elao.error_notifier.decision_manager.class%" />
+
+
+        <service id="elao.error_notifier.decider.client_ip" class="%elao.error_notifier.decider.client_ip.class%">
+            <argument type="service" id="request_stack" />
+            <argument />    <!-- ignored IPs -->
+            <tag name="elao.error_notifier.decider" />
+        </service>
+
+        <service id="elao.error_notifier.decider.exception_class" class="%elao.error_notifier.decider.exception_class.class%">
+            <argument />    <!-- ignored classes -->
+            <tag name="elao.error_notifier.decider" />
+        </service>
+
+        <service id="elao.error_notifier.decider.http_code" class="%elao.error_notifier.decider.http_code.class%">
+            <argument />    <!-- http codes -->
+            <tag name="elao.error_notifier.decider" />
+        </service>
+
+        <service id="elao.error_notifier.decider.php_error" class="%elao.error_notifier.decider.php_error.class%">
+            <argument />    <!-- ignored PHP errors -->
+            <argument />    <!-- handle PHP errors -->
+            <argument />    <!-- handle PHP warnings -->
+            <argument />    <!-- handle silent errors -->
+            <tag name="elao.error_notifier.decider" />
+        </service>
+
+        <service id="elao.error_notifier.decider.timeout" class="%elao.error_notifier.decider.timeout.class%">
+            <argument />    <!-- repeat timeout -->
+            <argument>%kernel.cache_dir%</argument>
+            <tag name="elao.error_notifier.decider" />
+        </service>
+
+        <service id="elao.error_notifier.decider.uri" class="%elao.error_notifier.decider.uri.class%">
+            <argument type="service" id="request_stack" />
+            <argument />    <!-- uri request matchers -->
+            <tag name="elao.error_notifier.decider" />
+        </service>
+
+        <service id="elao.error_notifier.decider.user_agent" class="%elao.error_notifier.decider.user_agent.class%">
+            <argument type="service" id="request_stack" />
+            <argument />    <!-- ignored user agent patterns -->
+            <tag name="elao.error_notifier.decider" />
+        </service>
+    </services>
+
+</container>

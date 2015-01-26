@@ -1,0 +1,7 @@
+.vagrant
+composer.lock
+coverage
+phpunit.xml
+vagrant
+Vagrantfile
+vendor/*

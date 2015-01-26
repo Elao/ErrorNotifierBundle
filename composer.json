@@ -19,22 +19,33 @@
 
     "require": {
         "php":                      ">=5.3.2",
-        "symfony/framework-bundle": "~2.0"
+        "beberlei/assert":          "~2",
+        "symfony/framework-bundle": "~2.3",
+        "symfony/console":          "~2.3"
+    },
+
+    "require-dev": {
+        "cleentfaar/slack":         "~0.17",
+        "matthiasnoback/symfony-dependency-injection-test": "~0.7",
+        "phpunit/phpunit":          "5.0.*",
+        "swiftmailer/swiftmailer":  "~5.0",
+        "twig/twig":                "~1.23|~2.0"
     },
 
     "suggest": {
-        "cleentfaar/slack-bundle": "Fos use with default slack notifier"
+        "cleentfaar/slack": "For use with default slack notifier",
+        "swiftmailer/swiftmailer": "For use with default mail notifier",
+        "twig/twig": "For use with default mail notifier"
     },
 
     "autoload": {
-        "psr-0": {
-            "Elao\\ErrorNotifierBundle": "."
+        "psr-4": {
+            "Elao\\ErrorNotifierBundle\\": ""
         }
     },
     "extra": {
         "branch-alias": {
             "dev-master": "1.0.x-dev"
         }
-    },
-    "target-dir": "Elao/ErrorNotifierBundle"
+    }
 }

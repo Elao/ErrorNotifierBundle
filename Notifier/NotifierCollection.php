@@ -2,6 +2,8 @@
 
 namespace Elao\ErrorNotifierBundle\Notifier;
 
+use Elao\ErrorNotifierBundle\Assertion\Assert;
+
 class NotifierCollection
 {
     /**
@@ -22,6 +24,8 @@ class NotifierCollection
      */
     public function __construct(array $enabledNotifiers)
     {
+        Assert::allString($enabledNotifiers);
+
         $this->enabledNotifiers = $enabledNotifiers;
     }
 
@@ -31,7 +35,7 @@ class NotifierCollection
      */
     public function addNotifier(NotifierInterface $notifier, $alias)
     {
-        $this->notifiers[ $this->isEnabled($alias) ? 'enabled' : 'disabled' ][] = $notifier;
+        $this->notifiers[ $this->isEnabled($alias) ? 'enabled' : 'disabled' ][$alias] = $notifier;
 
         return $this;
     }
@@ -41,7 +45,7 @@ class NotifierCollection
      */
     public function getAllEnabled()
     {
-        return $this->notifiers['enabled'];
+        return array_values($this->notifiers['enabled']);
     }
 
     /**
@@ -49,7 +53,7 @@ class NotifierCollection
      */
     public function getAllDisabled()
     {
-        return $this->notifiers['disabled'];
+        return array_values($this->notifiers['disabled']);
     }
 
     /**

@@ -1,0 +1,6 @@
+elao_error_notifier:
+    to: test@example.com
+    from: test@example.com
+    ignoredPhpErrors:
+        - E_NOTICE
+        - 1024

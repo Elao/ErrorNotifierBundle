@@ -2,6 +2,7 @@
 
 namespace Elao\ErrorNotifierBundle;
 
+use Elao\ErrorNotifierBundle\DependencyInjection\Compiler\DeciderCompilerPass;
 use Elao\ErrorNotifierBundle\DependencyInjection\Compiler\NotifierCompilerPass;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -15,6 +16,7 @@ class ElaoErrorNotifierBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new DeciderCompilerPass());
         $container->addCompilerPass(new NotifierCompilerPass());
     }
 }

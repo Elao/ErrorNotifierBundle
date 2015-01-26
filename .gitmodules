@@ -1,0 +1,12 @@
+[submodule "vagrant/puppet/modules/apt"]
+	path = vagrant/puppet/modules/apt
+	url = https://github.com/puppetlabs/puppetlabs-apt
+[submodule "vagrant/puppet/modules/puppetlabs-stdlib"]
+	path = vagrant/puppet/modules/puppetlabs-stdlib
+	url = https://github.com/puppetlabs/puppetlabs-stdlib.git
+[submodule "vagrant/puppet/modules/gcc"]
+	path = vagrant/puppet/modules/gcc
+	url = https://github.com/puppetlabs/puppetlabs-gcc.git
+[submodule "vagrant/puppet/modules/wget"]
+	path = vagrant/puppet/modules/wget
+	url = https://github.com/maestrodev/puppet-wget.git

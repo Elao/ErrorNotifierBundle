@@ -5,7 +5,6 @@ namespace Elao\ErrorNotifierBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -15,7 +14,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 /**
  * ElaoErrorNotifier Extension
  */
-class ElaoErrorNotifierExtension extends Extension implements PrependExtensionInterface
+class ElaoErrorNotifierExtension extends Extension
 {
     /**
      * load configuration
@@ -34,7 +33,7 @@ class ElaoErrorNotifierExtension extends Extension implements PrependExtensionIn
         // Load Twig filters by default
         $loader->load('twig.xml');
 
-        $enabledNotifiers = $config['enabled_notifiers'];
+        $enabledNotifiers = $config['enabledNotifiers'];
 
         if (empty($enabledNotifiers)) {
             return;
@@ -42,30 +41,111 @@ class ElaoErrorNotifierExtension extends Extension implements PrependExtensionIn
 
         $loader->load('services.xml');
 
-        $container
-            ->getDefinition('elao.error_notifier.configuration')
-            ->replaceArgument(1, $config['handle404'])
-            ->replaceArgument(2, $config['handlePHPErrors'])
-            ->replaceArgument(3, $config['handlePHPWarnings'])
-            ->replaceArgument(4, $config['handleSilentErrors'])
-            ->replaceArgument(5, $config['repeatTimeout'])
-            ->replaceArgument(6, $config['ignoredClasses'])
-        ;
+        $this->addDeciderConfiguration($loader, $config, $container);
 
-        $this->addRequestMatcherConfiguration($config, $container);
+        // add tag to RegisterErrorHandlersSubscriber
+        if ($config['handlePHPErrors'] || $config['handlePHPWarnings']) {
+            $container
+                ->getDefinition('elao.error_notifier.register_error_handlers_listener')
+                ->addTag('kernel.event_listener', array(
+                    'event'     => 'kernel.request',
+                    'method'    => 'onKernelRequest',
+                    'priority'  => '0'
+                ))
+                ->addTag('kernel.event_listener', array(
+                    'event'     => 'console.command',
+                    'method'    => 'onConsoleCommand',
+                    'priority'  => '0'
+                ))
+            ;
+        }
 
         if ($this->isNotifierEnabled('default_mailer', $enabledNotifiers)) {
-            $this->addMailerConfiguration($config, $container);
+            $this->addMailerConfiguration($loader, $config, $container);
         }
 
         if ($this->isNotifierEnabled('default_slack', $enabledNotifiers)) {
-            $this->addSlackConfiguration($config['notifiers']['slack'], $container);
+            $this->addSlackConfiguration($loader, $config['notifiers']['slack'], $container);
         }
 
         $container
             ->getDefinition('elao.error_notifier.notifier_collection')
             ->replaceArgument(0, $enabledNotifiers)
         ;
+    }
+
+    /**
+     * @param XmlFileLoader $loader
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    private function addDeciderConfiguration(XmlFileLoader $loader, array $config, ContainerBuilder $container)
+    {
+        $loader->load('decision_management.xml');
+
+        $container
+            ->getDefinition('elao.error_notifier.decider.client_ip')
+            ->replaceArgument(1, new Definition(
+                new Parameter('elao.error_notifier.matcher.class'),
+                array(null, null, null, $config['ignoredIPs'])
+            ))
+        ;
+
+        $container
+            ->getDefinition('elao.error_notifier.decider.exception_class')
+            ->replaceArgument(0, $config['ignoredClasses'])
+        ;
+
+        if ($config['handle404'] && !in_array('404', $config['handleHTTPCodes'])) {
+            $config['handleHTTPCodes'][] = '404';
+        }
+
+        $container
+            ->getDefinition('elao.error_notifier.decider.http_code')
+            ->replaceArgument(0, $config['handleHTTPCodes'])
+        ;
+
+        $container
+            ->getDefinition('elao.error_notifier.decider.php_error')
+            ->replaceArgument(0, $config['ignoredPhpErrors'])
+            ->replaceArgument(1, $config['handlePHPErrors'])
+            ->replaceArgument(2, $config['handlePHPWarnings'])
+            ->replaceArgument(3, $config['handleSilentErrors'])
+        ;
+
+        $container
+            ->getDefinition('elao.error_notifier.decider.timeout')
+            ->replaceArgument(0, $config['repeatTimeout'])
+        ;
+
+        $uriRequestMatchers = array();
+
+        foreach ($config['ignoredUrlPatterns'] as $path) {
+            $uriRequestMatchers[] = new Definition(
+                new Parameter('elao.error_notifier.matcher.class'),
+                array($path)
+            );
+        }
+
+        $container
+            ->getDefinition('elao.error_notifier.decider.uri')
+            ->replaceArgument(1, $uriRequestMatchers)
+        ;
+
+        $container
+            ->getDefinition('elao.error_notifier.decider.user_agent')
+            ->replaceArgument(1, $config['ignoredAgentPatterns'])
+        ;
+    }
+
+    /**
+     * @param $notifier
+     * @param array $enabledNotifiers
+     * @return bool
+     */
+    private function isNotifierEnabled($notifier, array $enabledNotifiers)
+    {
+        return in_array($notifier, $enabledNotifiers);
     }
 
     /**
@@ -93,43 +173,16 @@ class ElaoErrorNotifierExtension extends Extension implements PrependExtensionIn
     }
 
     /**
-     * @param $notifier
-     * @param array $enabledNotifiers
-     * @return bool
-     */
-    private function isNotifierEnabled($notifier, array $enabledNotifiers)
-    {
-        return in_array($notifier, $enabledNotifiers);
-    }
-
-    /**
-     * Add request matcher configuration
-     *
-     * @param array $config
-     * @param ContainerBuilder $container
-     */
-    private function addRequestMatcherConfiguration(array $config, ContainerBuilder $container)
-    {
-        $decisionManager = $container->getDefinition('elao.error_notifier.decision_manager.request_match');
-
-        if (!empty($config['ignored404Paths'])) {
-            foreach ($config['ignored404Paths'] as $path) {
-                $decisionManager->addMethodCall(
-                    'addRequestMatcher',
-                    array(new Definition(new Parameter('elao.error_notifier.matcher.class'), array($path)))
-                );
-            }
-        }
-    }
-
-    /**
      * Add default mailer configuration
      *
+     * @param XmlFileLoader $loader
      * @param array $config
      * @param ContainerBuilder $container
      */
-    private function addMailerConfiguration(array $config, ContainerBuilder $container)
+    private function addMailerConfiguration(XmlFileLoader $loader, array $config, ContainerBuilder $container)
     {
+        $loader->load('mailer.xml');
+
         $to = !empty($config['to']) ? $config['to'] : $config['notifiers']['mailer']['to'];
         $from = !empty($config['from']) ? $config['from'] :$config['notifiers']['mailer']['from'];
 
@@ -153,12 +206,15 @@ class ElaoErrorNotifierExtension extends Extension implements PrependExtensionIn
     /**
      * Add slack notifier configuration
      *
+     * @param XmlFileLoader $loader
      * @param array $config
      * @param ContainerBuilder $container
      * @throws \Exception
      */
-    private function addSlackConfiguration(array $config, ContainerBuilder $container)
+    private function addSlackConfiguration(XmlFileLoader $loader, array $config, ContainerBuilder $container)
     {
+        $loader->load('slack.yml');
+
         foreach (array('api_token', 'channel') as $field) {
             if (!$config[$field]) {
                 throw new InvalidConfigurationException(sprintf(
@@ -172,22 +228,17 @@ class ElaoErrorNotifierExtension extends Extension implements PrependExtensionIn
             ->getDefinition('elao.error_notifier.notifier.default_slack')
             ->replaceArgument(2, $config['channel'])
         ;
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function prepend(ContainerBuilder $container)
-    {
-        $bundles = $container->getParameter('kernel.bundles');
-
-        $configs = $container->getExtensionConfig($this->getAlias());
-        $config = $this->processConfiguration(new Configuration(), $configs);
-
-        $clSlackApiToken = $config['notifiers']['slack']['api_token'];
-
-        if (isset($bundles['CLSlackBundle']) && $clSlackApiToken) {
-            $container->prependExtensionConfig('cl_slack', array('api_token' => $clSlackApiToken));
+        if (!class_exists('CL\Slack\Transport\ApiClient')) {
+            throw new \Exception(
+                'Default Slack notifier requires the "CL\Slack\Transport\ApiClient" class, part of the cleentfaar/slack package'
+            );
         }
+
+        $container
+            ->getDefinition('elao.error_notifier.client.slack')
+            ->setClass('CL\Slack\Transport\ApiClient')
+            ->replaceArgument(0, $config['token'])
+        ;
     }
 }

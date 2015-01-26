@@ -2,20 +2,20 @@
 
 namespace Elao\ErrorNotifierBundle\Handler;
 
-use Elao\ErrorNotifierBundle\Configuration\Configuration;
+use Elao\ErrorNotifierBundle\DecisionManagement\Manager\NotificationDecisionManagerInterface;
 use Elao\ErrorNotifierBundle\Exception\ErrorException;
+use Elao\ErrorNotifierBundle\Util\MemoryManagement;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\FlattenException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ExceptionHandler implements ExceptionHandlerInterface
 {
     /**
-     * @var Configuration
+     * @var NotificationDecisionManagerInterface
      */
-    private $configuration;
+    private $decisionManager;
 
     /**
      * @var NotificationHandlerInterface
@@ -37,43 +37,48 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     private $commandInput;
 
-    private static $tmpBuffer = null;
-
     /**
-     * @param Configuration $configuration
+     * Constructor.
+     *
+     * @param NotificationDecisionManagerInterface $decisionManager
      * @param NotificationHandlerInterface $notificationHandler
      */
     public function __construct(
-        Configuration $configuration,
+        NotificationDecisionManagerInterface $decisionManager,
         NotificationHandlerInterface $notificationHandler
     ) {
-        $this->configuration = $configuration;
+        $this->decisionManager = $decisionManager;
         $this->notificationHandler = $notificationHandler;
-
-        if (!is_dir($configuration->getErrorsDirectory())) {
-            mkdir($configuration->getErrorsDirectory());
-        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function initializeHandler(
-        Request $request = null,
-        Command $command = null,
-        InputInterface $commandInput = null
-    ) {
+    public function setRequest(Request $request)
+    {
         $this->request = $request;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCommand(Command $command)
+    {
         $this->command = $command;
-        $this->commandInput = $commandInput;
 
-        if (!$this->configuration->handlePHPErrors() && !$this->configuration->handlePHPWarnings()) {
-            return;
-        }
+        return $this;
+    }
 
-        self::_reserveMemory();
+    /**
+     * {@inheritdoc}
+     */
+    public function setCommandInput(InputInterface $input)
+    {
+        $this->commandInput = $input;
 
-        $this->setErrorHandlers();
+        return $this;
     }
 
     /**
@@ -81,18 +86,9 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     public function handlePhpError($level, $message, $file, $line, $errorContext)
     {
-        // don't catch error with error_reporting is 0
-        if (0 === error_reporting() && !$this->configuration->handleSilentErrors()) {
-            return false;
-        }
-
-        if (!$this->configuration->handleWarning($level)) {
-            return false;
-        }
-
         $exception = new ErrorException($level, $message, $file, $line);
 
-        $this->handleException($exception, $this->request, $errorContext, $this->command, $this->commandInput);
+        $this->handleException($exception);
 
         // in order not to bypass the standard PHP error handler
         return false;
@@ -103,70 +99,34 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     public function handlePhpFatalErrorAndWarnings()
     {
-        self::_freeMemory();
+        MemoryManagement::freeMemory();
 
         if (null === $lastError = error_get_last()) {
             return;
         }
 
-        if ($this->configuration->handleWarning($lastError['type'])) {
-            $exception = new ErrorException(
-                @$lastError['type'],
-                @$lastError['message'],
-                @$lastError['file'],
-                @$lastError['line'],
-                @$lastError['type']
-            );
+        $exception = new ErrorException(
+            @$lastError['type'],
+            @$lastError['message'],
+            @$lastError['file'],
+            @$lastError['line'],
+            @$lastError['type']
+        );
 
-            $this->handleException($exception, $this->request);
-        }
+        $this->handleException($exception);
     }
 
     /**
-     * @param \Exception $exception
-     * @param Request $request
+     * {@inheritdoc}
      */
-    public function handleException(\Exception $exception, Request $request = null)
+    public function handleException(\Exception $exception)
     {
+        if (false === $this->decisionManager->notifyError($exception)) {
+            return;
+        }
+
         $flattened = $exception instanceof FlattenException ? $exception : FlattenException::create($exception);
 
-        if ($exception instanceof HttpException && !$this->configuration->handleError($flattened->getStatusCode())) {
-            return;
-        }
-
-        if ($this->configuration->ignoreExceptionClass($flattened)) {
-            return;
-        }
-
         $this->notificationHandler->notify($flattened, $this->request, null, $this->command, $this->commandInput);
-    }
-
-    /**
-     * @return null
-     */
-    protected function setErrorHandlers()
-    {
-        // set_error_handler and register_shutdown_function can be triggered on
-        // both warnings and errors
-        set_error_handler(array($this, 'handlePhpError'), E_ALL);
-
-        // From PHP Documentation: the following error types cannot be handled with
-        // a user defined function using set_error_handler: *E_ERROR*, *E_PARSE*, *E_CORE_ERROR*, *E_CORE_WARNING*,
-        // *E_COMPILE_ERROR*, *E_COMPILE_WARNING*
-        // That is we need to use also register_shutdown_function()
-        register_shutdown_function(array($this, 'handlePhpFatalErrorAndWarnings'));
-    }
-
-    /**
-     * This allows to catch memory limit fatal errors.
-     */
-    protected static function _reserveMemory()
-    {
-        self::$tmpBuffer = str_repeat('x', 1024 * 500);
-    }
-
-    protected static function _freeMemory()
-    {
-        self::$tmpBuffer = '';
     }
 }

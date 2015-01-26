@@ -13,15 +13,14 @@ class NotifierCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('elao.error_notifier.notifier_collection')) {
+        if (!$container->has('elao.error_notifier.notifier_collection')) {
             return;
         }
 
-
-        $definition = $container->getDefinition('elao.error_notifier.notifier_collection');
+        $definition = $container->findDefinition('elao.error_notifier.notifier_collection');
 
         $taggedServices = $container->findTaggedServiceIds(
-            'elao.error_notifier'
+            'elao.error_notifier.notifier'
         );
 
         foreach ($taggedServices as $id => $tags) {
