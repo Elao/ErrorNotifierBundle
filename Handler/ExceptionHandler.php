@@ -61,13 +61,13 @@ class ExceptionHandler implements ExceptionHandlerInterface
         Command $command = null,
         InputInterface $commandInput = null
     ) {
-        if (!$this->configuration->handlePHPErrors() && !$this->configuration->handlePHPWarnings()) {
-            return;
-        }
-
         $this->request = $request;
         $this->command = $command;
         $this->commandInput = $commandInput;
+
+        if (!$this->configuration->handlePHPErrors() && !$this->configuration->handlePHPWarnings()) {
+            return;
+        }
 
         self::_reserveMemory();
 
