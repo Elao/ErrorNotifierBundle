@@ -2,7 +2,7 @@
 
 namespace Elao\ErrorNotifierBundle\Configuration;
 
-use Symfony\Component\Debug\Exception\FlattenException;
+use Elao\ErrorNotifierBundle\Exception\FlattenException;
 
 class Configuration
 {
@@ -106,6 +106,15 @@ class Configuration
     public function handlePHPErrors()
     {
         return $this->handlePHPErrors;
+    }
+
+    /**
+     * @param integer $statusCode
+     * @return bool
+     */
+    public function handleError($statusCode)
+    {
+        return 500 === $statusCode || (404 === $statusCode && $this->handle404Errors());
     }
 
     /**

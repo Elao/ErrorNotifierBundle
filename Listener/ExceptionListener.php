@@ -10,7 +10,7 @@ use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 /**
- * Notifier
+ * Exception Listener
  */
 class ExceptionListener
 {

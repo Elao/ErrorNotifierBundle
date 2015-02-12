@@ -51,7 +51,8 @@ class ElaoErrorNotifierExtension extends Extension
             foreach (array('to', 'from') as $field) {
                 if (!filter_var($config[$field], FILTER_VALIDATE_EMAIL)) {
                     throw new InvalidConfigurationException(sprintf(
-                        'Invalid configuration for path "elao_error_notifier.%s": This must be a valid email address if "default_mailer" is in the enabled_notifiers',
+                        'Invalid configuration for path "elao_error_notifier.%s": This must '.
+                        'be a valid email address if "default_mailer" is in the enabled_notifiers',
                         $field
                     ), 500);
                 }

@@ -7,7 +7,7 @@ class ErrorException extends \ErrorException
     public function __construct($severity = 1, $message = '', $filename = __FILE__, $lineNumber = __LINE__, $code = 0)
     {
         parent::__construct(
-            sprintf(sprintf('%s: %s in %s line %d', @$this->getErrorString($severity), $message, $filename, $lineNumber)),
+            sprintf('%s: %s in %s line %d', @$this->getErrorString($severity), $message, $filename, $lineNumber),
             $code,
             $severity,
             $filename,

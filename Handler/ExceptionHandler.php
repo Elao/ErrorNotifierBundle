@@ -4,9 +4,9 @@ namespace Elao\ErrorNotifierBundle\Handler;
 
 use Elao\ErrorNotifierBundle\Configuration\Configuration;
 use Elao\ErrorNotifierBundle\Exception\ErrorException;
+use Elao\ErrorNotifierBundle\Exception\FlattenException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -130,13 +130,15 @@ class ExceptionHandler implements ExceptionHandlerInterface
             $exception = FlattenException::create($exception);
         }
 
-        if ($exception instanceof HttpException) {
-            if (500 === $exception->getStatusCode() || (404 === $exception->getStatusCode() && $this->configuration->handle404Errors())) {
-                $this->notificationHandler->notify($exception, $request);
-            }
-        } elseif (!$this->configuration->ignoreExceptionClass($exception)) {
-            $this->notificationHandler->notify($exception, $request, null, $this->command, $this->commandInput);
+        if ($exception instanceof HttpException && !$this->configuration->handleError($exception->getStatusCode())) {
+            return;
         }
+
+        if ($this->configuration->ignoreExceptionClass($exception)) {
+            return;
+        }
+
+        $this->notificationHandler->notify($exception, $request, null, $this->command, $this->commandInput);
     }
 
     /**

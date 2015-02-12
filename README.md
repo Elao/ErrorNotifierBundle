@@ -59,14 +59,18 @@ Add in your `config_prod.yml` file, you don't need error notifier when you are i
 ```yml
 # app/config/config_prod.yml
 elao_error_notifier:
-    from: from@example.com
-    to: to@example.com
+    from: from@example.com # required if using "default_mailer" notifier
+    to: to@example.com # required if using "default_mailer" notifier
     handle404: true # default :  false
     mailer: your.mailer.id # default : mailer
     handlePHPErrors: true # catch fatal erros and email them
     handlePHPWarnings: true # catch warnings and email them
     handleSilentErrors: false # don't catch error on method with an @
     ignoredClasses: ~
+    enabled_notifiers: # default : [ default_mailer ]
+        - notifier_aliases
+        - ...
+    enabled: true # in case you want to have settings in config.yml, just add "enabled: false" to config_[!prod].yml
 ```
 
 ### How to setup another mailer for sending the error mail
@@ -119,6 +123,29 @@ elao_error_notifier:
 
 In this example, if an errors X occurs, and the same error X occurs again within 1 hour, you won't recieve a 2nd email.
 
+### How to add alternative notifiers ?
+
+Create your notifier as a service, making sure it implements the `Elao\ErrorNotifierBundle\Notifier\NotifierInterface`.
+
+Add the `elao.error_notifier` tag with the name of your notifier as the alias.
+
+```yml
+services:
+    acme.error_notifier.mailer:
+        ....
+        tags:
+            - { name: elao.error_notifier, alias: acme_mailer }
+```
+
+Add the name/alias that you have set for your notifier to the  `enabled_notifiers`
+
+```yml
+# app/config/config_prod.yml
+elao_error_notifier:
+    enabled_notifiers:
+        - acme_mailer 
+```
+
 ## Twig Extension
 
 There are also some extensions that you can use in your Twig templates (thanks to [Goutte](https://github.com/Goutte))
@@ -142,7 +169,6 @@ You may control the depth of recursion with a parameter, say foo = array('a'=>ar
                                    - d
 
 Default value is 1. (MAX_DEPTH const)
-
 
 ## Screenshot
 
