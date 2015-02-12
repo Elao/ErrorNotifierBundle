@@ -23,6 +23,7 @@ class Configuration implements ConfigurationInterface
         $root = $treeBuilder->root('elao_error_notifier');
 
         $root
+            ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('to')
                     ->isRequired()
@@ -51,8 +52,17 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue(false)
                 ->end()
                 ->arrayNode('ignoredClasses')
-                    ->prototype('scalar')
+                    ->prototype('scalar')->end()
                     ->treatNullLike(array())
+                ->end()
+
+                ->arrayNode('enabled_notifiers')
+                    ->prototype('scalar')->end()
+                    ->treatNullLike(array())
+                ->end()
+
+                ->booleanNode('enable_notifications')
+                    ->defaultValue(true)
                 ->end()
             ->end();
 

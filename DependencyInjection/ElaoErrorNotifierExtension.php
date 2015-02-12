@@ -14,7 +14,6 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
  */
 class ElaoErrorNotifierExtension extends Extension
 {
-
     /**
      * load configuration
      *
@@ -26,18 +25,44 @@ class ElaoErrorNotifierExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
+        $config = $this->processConfiguration($configuration, $configs);
 
-        if (count($configs[0])) {
-            $config = $this->processConfiguration($configuration, $configs);
+        if (!$config['enable_notifications']) {
+            return;
+        }
 
-            $container->setParameter('elao.error_notifier.config', $config);
+        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config/')));
+        $loader->load('services.xml');
 
-            $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config/')));
-            $loader->load('services.xml');
+        $container
+            ->getDefinition('elao.error_notifier.configuration')
+            ->replaceArgument(1, $config['handle404'])
+            ->replaceArgument(2, $config['handlePHPErrors'])
+            ->replaceArgument(3, $config['handlePHPWarnings'])
+            ->replaceArgument(4, $config['handleSilentErrors'])
+            ->replaceArgument(5, $config['repeatTimeout'])
+            ->replaceArgument(6, $config['ignoredClasses'])
+        ;
+
+        if ('' !== $config['to'] && '' !== $config['from']) {
+            $container
+                ->getDefinition('elao.error_notifier.notifier.default_mailer')
+                ->addTag('elao.error_notifier', array('alias' => 'elao.default_mailer'))
+                ->replaceArgument(2, $config['to'])
+                ->replaceArgument(3, $config['from'])
+            ;
 
             if ($config['mailer'] != 'mailer') {
-                $container->getDefinition('elao.error_notifier.listener')->replaceArgument(0, new Reference($config['mailer']));
+                $container
+                    ->getDefinition('elao.error_notifier.notifier.default_mailer')
+                    ->replaceArgument(0, new Reference($config['mailer']))
+                ;
             }
         }
+
+        $container
+            ->getDefinition('elao.error_notifier.notifier_collection')
+            ->replaceArgument(0, $config['enabledNotifiers'])
+        ;
     }
 }
