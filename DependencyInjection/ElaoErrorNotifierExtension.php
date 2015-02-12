@@ -2,6 +2,7 @@
 
 namespace Elao\ErrorNotifierBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -44,7 +45,18 @@ class ElaoErrorNotifierExtension extends Extension
             ->replaceArgument(6, $config['ignoredClasses'])
         ;
 
-        if ('' !== $config['to'] && '' !== $config['from']) {
+        $enabledNotifiers = $config['enabledNotifiers'];
+
+        if (in_array('default_mailer', $enabledNotifiers)) {
+            foreach (array('to', 'from') as $field) {
+                if (!filter_var($config[$field], FILTER_VALIDATE_EMAIL)) {
+                    throw new InvalidConfigurationException(sprintf(
+                        'Invalid configuration for path "elao_error_notifier.%s": This must be a valid email address if "default_mailer" is in the enabled_notifiers',
+                        $field
+                    ), 500);
+                }
+            }
+
             $container
                 ->getDefinition('elao.error_notifier.notifier.default_mailer')
                 ->addTag('elao.error_notifier', array('alias' => 'elao.default_mailer'))
@@ -62,7 +74,7 @@ class ElaoErrorNotifierExtension extends Extension
 
         $container
             ->getDefinition('elao.error_notifier.notifier_collection')
-            ->replaceArgument(0, $config['enabledNotifiers'])
+            ->replaceArgument(0, $enabledNotifiers)
         ;
     }
 }
