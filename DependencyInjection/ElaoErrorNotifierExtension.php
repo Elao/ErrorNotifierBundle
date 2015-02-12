@@ -48,15 +48,8 @@ class ElaoErrorNotifierExtension extends Extension
         $enabledNotifiers = $config['enabledNotifiers'];
 
         if (in_array('default_mailer', $enabledNotifiers)) {
-            foreach (array('to', 'from') as $field) {
-                if (!filter_var($config[$field], FILTER_VALIDATE_EMAIL)) {
-                    throw new InvalidConfigurationException(sprintf(
-                        'Invalid configuration for path "elao_error_notifier.%s": This must '.
-                        'be a valid email address if "default_mailer" is in the enabled_notifiers',
-                        $field
-                    ), 500);
-                }
-            }
+            $this->validateEmails($config['to'], 'to');
+            $this->validateEmails($config['from'], 'from');
 
             $container
                 ->getDefinition('elao.error_notifier.notifier.default_mailer')
@@ -77,5 +70,32 @@ class ElaoErrorNotifierExtension extends Extension
             ->getDefinition('elao.error_notifier.notifier_collection')
             ->replaceArgument(0, $enabledNotifiers)
         ;
+    }
+
+    /**
+     * Validate given emails
+     *
+     * @param array $config
+     * @param string $field
+     * @throws InvalidConfigurationException
+     */
+    private function validateEmails(array $config, $field)
+    {
+        $emails = $config[$field];
+
+        if (!is_array($config[$field])) {
+            $emails = array($config[$field]);
+        }
+
+        foreach ($emails as $email) {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new InvalidConfigurationException(sprintf(
+                    'Invalid configuration for path "elao_error_notifier.%s": This must '.
+                    'be a valid email address if "default_mailer" is in the enabled_notifiers',
+                    $field
+                ), 500);
+            }
+        }
+
     }
 }

@@ -25,9 +25,15 @@ class Configuration implements ConfigurationInterface
         $root
             ->addDefaultsIfNotSet()
             ->children()
-                ->scalarNode('to')
-                    ->treatNullLike('')
-                    ->treatFalseLike('')
+                ->arrayNode('to')
+                    ->beforeNormalization()
+                    ->ifString()
+                        ->then(function ($value) {
+                            return array($value);
+                        })
+                    ->end()
+                    ->treatNullLike(array())
+                    ->prototype('scalar')->end()
                 ->end()
                 ->scalarNode('from')
                     ->treatNullLike('')

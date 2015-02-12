@@ -60,7 +60,7 @@ Add in your `config_prod.yml` file, you don't need error notifier when you are i
 # app/config/config_prod.yml
 elao_error_notifier:
     from: from@example.com # required if using "default_mailer" notifier
-    to: to@example.com # required if using "default_mailer" notifier
+    to: to@example.com # required if using "default_mailer" notifier, can be a string or an array or email addresses
     handle404: true # default :  false
     mailer: your.mailer.id # default : mailer
     handlePHPErrors: true # catch fatal erros and email them
