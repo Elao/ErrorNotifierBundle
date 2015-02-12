@@ -28,7 +28,7 @@ class ElaoErrorNotifierExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        if (!$config['enable_notifications']) {
+        if (!$config['enabled']) {
             return;
         }
 

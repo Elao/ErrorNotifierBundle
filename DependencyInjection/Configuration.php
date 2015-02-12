@@ -61,7 +61,7 @@ class Configuration implements ConfigurationInterface
                     ->treatNullLike(array('default_mailer'))
                 ->end()
 
-                ->booleanNode('enable_notifications')
+                ->booleanNode('enabled')
                     ->defaultValue(true)
                 ->end()
             ->end();
