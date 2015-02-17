@@ -70,7 +70,6 @@ elao_error_notifier:
     enabled_notifiers: # default : [ default_mailer ]
         - notifier_aliases
         - ...
-    enabled: true # in case you want to have settings in config.yml, just add "enabled: false" to config_[!prod].yml
 ```
 
 ### How to setup another mailer for sending the error mail

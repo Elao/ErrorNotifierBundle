@@ -66,10 +66,6 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')->end()
                     ->treatNullLike(array('default_mailer'))
                 ->end()
-
-                ->booleanNode('enabled')
-                    ->defaultValue(true)
-                ->end()
             ->end();
 
         return $treeBuilder;

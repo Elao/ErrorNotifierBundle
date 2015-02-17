@@ -28,7 +28,9 @@ class ElaoErrorNotifierExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        if (!$config['enabled']) {
+        $enabledNotifiers = $config['enabledNotifiers'];
+
+        if (empty($enabledNotifiers)) {
             return;
         }
 
@@ -44,8 +46,6 @@ class ElaoErrorNotifierExtension extends Extension
             ->replaceArgument(5, $config['repeatTimeout'])
             ->replaceArgument(6, $config['ignoredClasses'])
         ;
-
-        $enabledNotifiers = $config['enabledNotifiers'];
 
         if (in_array('default_mailer', $enabledNotifiers)) {
             $this->validateEmails($config['to'], 'to');
