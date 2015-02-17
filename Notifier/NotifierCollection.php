@@ -39,7 +39,7 @@ class NotifierCollection
     /**
      * @return NotifierInterface[]
      */
-    public function getAllDisabled()
+    public function getAllEnabled()
     {
         return $this->notifiers['enabled'];
     }
@@ -47,7 +47,7 @@ class NotifierCollection
     /**
      * @return NotifierInterface[]
      */
-    public function getAllEnabled()
+    public function getAllDisabled()
     {
         return $this->notifiers['disabled'];
     }
