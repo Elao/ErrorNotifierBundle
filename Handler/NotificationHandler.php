@@ -3,12 +3,12 @@
 namespace Elao\ErrorNotifierBundle\Handler;
 
 use Elao\ErrorNotifierBundle\Configuration\Configuration;
-use Elao\ErrorNotifierBundle\Exception\FlattenException;
 use Elao\ErrorNotifierBundle\Notifier\NotifierCollection;
 use Elao\ErrorNotifierBundle\Notifier\NotifierInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\FlattenException;
 
 class NotificationHandler implements NotificationHandlerInterface
 {

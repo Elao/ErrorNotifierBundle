@@ -28,7 +28,7 @@ class ElaoErrorNotifierExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $enabledNotifiers = $config['enabledNotifiers'];
+        $enabledNotifiers = $config['enabled_notifiers'];
 
         if (empty($enabledNotifiers)) {
             return;
@@ -47,16 +47,9 @@ class ElaoErrorNotifierExtension extends Extension
             ->replaceArgument(6, $config['ignoredClasses'])
         ;
 
-        if (in_array('default_mailer', $enabledNotifiers)) {
-            $this->validateEmails($config['to'], 'to');
-            $this->validateEmails($config['from'], 'from');
-
-            $container
-                ->getDefinition('elao.error_notifier.notifier.default_mailer')
-                ->addTag('elao.error_notifier', array('alias' => 'elao.default_mailer'))
-                ->replaceArgument(2, $config['to'])
-                ->replaceArgument(3, $config['from'])
-            ;
+        if ($this->isNotifierEnabled('default_mailer', $enabledNotifiers)) {
+            $this->addMailerConfiguration($config, $container);
+        }
 
             if ($config['mailer'] != 'mailer') {
                 $container
@@ -75,16 +68,14 @@ class ElaoErrorNotifierExtension extends Extension
     /**
      * Validate given emails
      *
-     * @param array $config
+     * @param array $emails
      * @param string $field
      * @throws InvalidConfigurationException
      */
-    private function validateEmails(array $config, $field)
+    private function validateEmails($emails, $field)
     {
-        $emails = $config[$field];
-
-        if (!is_array($config[$field])) {
-            $emails = array($config[$field]);
+        if (!is_array($emails)) {
+            $emails = array($emails);
         }
 
         foreach ($emails as $email) {
@@ -95,6 +86,45 @@ class ElaoErrorNotifierExtension extends Extension
                     $field
                 ), 500);
             }
+        }
+    }
+
+    /**
+     * @param $notifier
+     * @param array $enabledNotifiers
+     * @return bool
+     */
+    private function isNotifierEnabled($notifier, array $enabledNotifiers)
+    {
+        return in_array($notifier, $enabledNotifiers);
+    }
+
+    /**
+     * Add default mailer configuration
+     *
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    private function addMailerConfiguration(array $config, ContainerBuilder $container)
+    {
+        $to = !empty($config['to']) ? $config['to'] : $config['notifiers']['mailer']['to'];
+        $from = !empty($config['from']) ? $config['from'] :$config['notifiers']['mailer']['from'];
+
+        $this->validateEmails($to, 'to');
+        $this->validateEmails($from, 'from');
+
+        $container
+            ->getDefinition('elao.error_notifier.notifier.default_mailer')
+            ->addTag('elao.error_notifier', array('alias' => 'default_mailer'))
+            ->replaceArgument(2, $to)
+            ->replaceArgument(3, $from)
+        ;
+
+        if ($config['mailer'] != 'mailer') {
+            $container
+                ->getDefinition('elao.error_notifier.notifier.default_mailer')
+                ->replaceArgument(0, new Reference($config['mailer']))
+            ;
         }
 
     }

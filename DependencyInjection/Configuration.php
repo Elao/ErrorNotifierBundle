@@ -32,12 +32,11 @@ class Configuration implements ConfigurationInterface
                             return array($value);
                         })
                     ->end()
-                    ->treatNullLike(array())
+                    ->treatNullLike(false)
                     ->prototype('scalar')->end()
                 ->end()
                 ->scalarNode('from')
-                    ->treatNullLike('')
-                    ->treatFalseLike('')
+                    ->treatNullLike(false)
                 ->end()
                 ->booleanNode('handle404')
                     ->defaultValue(false)
@@ -66,6 +65,32 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')->end()
                     ->treatNullLike(array('default_mailer'))
                 ->end()
+
+                ->arrayNode('notifiers')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('mailer')
+                            ->children()
+                                ->arrayNode('to')
+                                    ->beforeNormalization()
+                                    ->ifString()
+                                        ->then(function ($value) {
+                                            return array($value);
+                                        })
+                                    ->end()
+                                    ->treatNullLike(array())
+                                    ->defaultValue(array())
+                                    ->prototype('scalar')->end()
+                                ->end()
+                                ->scalarNode('from')
+                                    ->treatNullLike(false)
+                                    ->defaultValue(false)
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+
             ->end();
 
         return $treeBuilder;

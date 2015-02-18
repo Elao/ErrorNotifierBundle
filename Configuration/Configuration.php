@@ -2,7 +2,7 @@
 
 namespace Elao\ErrorNotifierBundle\Configuration;
 
-use Elao\ErrorNotifierBundle\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Exception\FlattenException;
 
 class Configuration
 {

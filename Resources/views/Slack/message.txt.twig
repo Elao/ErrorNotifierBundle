@@ -1,0 +1,307 @@
+{% spaceless %}
+
+*{{ exception.message }}*\n
+*{{ status_code }}* - {{ exception.class|abbr_class }}\n
+\n
+*Information*:\n
+*Generated at*: {{ "now"|date("d-m-Y H:i:s") }}\n
+*Class name*: {{ exception.class }}\n
+*Message*: {{ exception.message }}
+{% if request %}\n*Uri*: {{ request.uri }}{% endif %}
+{% if command %}\n*Command*: {{ command.name }}{% endif %}
+
+{% endspaceless %}
+{#
+*Stack Trace*
+```
+{% for position, e in exception.toarray %}
+    {% for i, trace in exception.trace %}
+        {{ loop.index }}
+        {% if trace.class is defined %}
+            at *{{ trace.class }} {{ trace.type ~ trace.function }}*
+            {% if trace.args is defined %}
+                {% if trace.args is iterable %}
+                    {{ trace.args|format_args }}
+                {% else %}
+                    ({{ trace.args }})
+                {% endif %}
+            {% endif %}
+        {% else %}
+            {{ trace.function }}()
+        {% endif %}
+        {% if trace.file is defined and trace.file and trace.line is defined and trace.line %}
+            {{ trace.function ? '<br />' : '' }} in {{ trace.file|format_file(trace.line) }}&nbsp;
+                                                <div id="trace_{{ 0 ~ '_' ~ i }}" class="trace">
+                                                    {{ trace.file|file_excerpt(trace.line) }}
+                                                </div>
+                                            {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ol>
+                                {% endfor %}
+```
+                            </div>
+                        </td>
+                    </tr>
+                    </tr>
+                </table>
+
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+                {% if command_input %}
+                    {% if command_input.options|length %}
+                        {#-- Command Options Block --# }
+                        <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                            <tr>
+                                <td>
+                                    <h4>Command Options</h4>
+                                    <table>
+                                    <tr>
+                                        <th>Variable</th>
+                                        <th>Value</th>
+                                    </tr>
+                                    {% for key, value in command_input.options %}
+                                        <tr>
+                                            <th style="border-top: 1px solid #999; vertical-align: top;"><pre>{{ key }} =</pre></th>
+                                            <td style="border-top: 1px solid #999">{{ value|dumpy(2) }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                                </td>
+                            </tr>
+                        </table>
+                    {% endif %}
+                    {% if command_input.arguments|length %}
+                        {#-- Command Arguments Block --# }
+                        <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                            <tr>
+                                <td>
+
+                                    <h4>Command Arguments</h4>
+                                    <table>
+
+                                        <tr>
+                                            <th>Variable</th>
+                                            <th>Value</th>
+                                        </tr>
+                                        {% for key, value in command_input.arguments %}
+                                            <tr>
+                                                <th style="border-top: 1px solid #999; vertical-align: top;"><pre>{{ key }} =</pre></th>
+                                                <td style="border-top: 1px solid #999">{{ value|dumpy(2) }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    {% endif %}
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+                {% endif %}
+                {% if context is defined %}
+                    {#-- Variables Parameters Block --# }
+                    <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                        <tr>
+                            <td>
+                                <h4>Scope Variables</h4>
+
+                                {% if context|length %}
+                                    <table>
+                                        <tr>
+                                            <th>Variable</th>
+                                            <th>Value</th>
+                                        </tr>
+                                        {% for key, value in context %}
+                                            <tr>
+                                                <th style="border-top: 1px solid #999; vertical-align: top;"><pre>${{ key }} =</pre></th>
+                                                <td style="border-top: 1px solid #999">{{ value|dumpy(2) }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                {% else %}
+                                    <p>
+                                        <em>No variables captured</em>
+                                    </p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table>
+                        <tr>
+                            <td style="height: 20px;"></td>
+                        </tr>
+                    </table>
+                {% endif %}
+                {% if request %}
+                {#-- Request GET Parameters Block --# }
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Request GET Parameters</h4>
+
+                            {% if request.query.all|length %}
+                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.query } only %}
+                            {% else %}
+                                <p>
+                                    <em>No GET parameters</em>
+                                </p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+
+                {#-- Request POST Parameters Block --# }
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Request POST Parameters</h4>
+
+                            {% if request.request.all|length %}
+                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.request } only %}
+                            {% else %}
+                                <p>
+                                    <em>No POST parameters</em>
+                                </p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+
+                {#-- Request Attributes Block --# }
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Request Attributes</h4>
+
+                            {% if request.attributes.all|length %}
+                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.attributes } only %}
+                            {% else %}
+                                <p>
+                                    <em>No Request Attributes</em>
+                                </p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+
+                {#-- Request Cookies Block --# }
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Request Cookies</h4>
+
+                            {% if request.cookies.all|length %}
+                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.cookies } only %}
+                            {% else %}
+                                <p>
+                                    <em>No Request Cookies</em>
+                                </p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+
+                {#-- Request Headers Block --# }
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Request Headers</h4>
+                            {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.headers } only %}
+                        </td>
+                    </tr>
+                </table>
+
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+
+                {#-- Request Server Parameters Block --# }
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Request Server Parameters </h4>
+                            {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.server } only %}
+                        </td>
+                    </tr>
+                </table>
+
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+
+                {#-- Request Session Attributes Block --# }
+                <table style="background: #fff; margin: 0 0 20px 0; width: 100%;">
+                    <tr>
+                        <td>
+                            <h4>Session Attributes</h4>
+
+                            {% if request.session.all|length %}
+                                <table>
+                                    <tr>
+                                        <th>Key</th>
+                                        <th>Value</th>
+                                    </tr>
+                                    {% set attributes = request.session.all %}
+                                    {% for key in attributes|keys|sort %}
+                                        <tr>
+                                            <th>{{ key }}</th>
+                                            <td>{{ attributes[key]|yaml_dump }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            {% else %}
+                                <p>
+                                    <em>No session attributes</em>
+                                </p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+
+                <table>
+                    <tr>
+                        <td style="height: 20px;"></td>
+                    </tr>
+                </table>
+        {% endif %}
+
+            </div>
+        </div>
+    </body>
+</html>
+#}

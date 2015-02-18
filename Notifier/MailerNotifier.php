@@ -2,11 +2,11 @@
 
 namespace Elao\ErrorNotifierBundle\Notifier;
 
-use Elao\ErrorNotifierBundle\Exception\FlattenException;
 use \Swift_Mailer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\Templating\EngineInterface;
 
 class MailerNotifier implements NotifierInterface
@@ -55,7 +55,7 @@ class MailerNotifier implements NotifierInterface
         Command $command = null,
         InputInterface $commandInput = null
     ) {
-        $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
+        $body = $this->templating->render('ElaoErrorNotifierBundle:Mailer:mail.html.twig', array(
             'exception'       => $exception,
             'request'         => $request,
             'status_code'     => $exception->getCode(),

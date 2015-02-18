@@ -2,10 +2,10 @@
 
 namespace Elao\ErrorNotifierBundle\Notifier;
 
-use Elao\ErrorNotifierBundle\Exception\FlattenException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\FlattenException;
 
 interface NotifierInterface
 {
