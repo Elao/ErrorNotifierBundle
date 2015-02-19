@@ -64,6 +64,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('enabled_notifiers')
                     ->prototype('scalar')->end()
                     ->treatNullLike(array('default_mailer'))
+                    ->performNoDeepMerging()
                 ->end()
 
                 ->arrayNode('notifiers')
