@@ -47,16 +47,12 @@ class ElaoErrorNotifierExtension extends Extension
             ->replaceArgument(6, $config['ignoredClasses'])
         ;
 
+        $this->addRequestMatcherConfiguration($config, $container);
+
         if ($this->isNotifierEnabled('default_mailer', $enabledNotifiers)) {
             $this->addMailerConfiguration($config, $container);
         }
 
-            if ($config['mailer'] != 'mailer') {
-                $container
-                    ->getDefinition('elao.error_notifier.notifier.default_mailer')
-                    ->replaceArgument(0, new Reference($config['mailer']))
-                ;
-            }
         }
 
         $container
@@ -100,6 +96,26 @@ class ElaoErrorNotifierExtension extends Extension
     }
 
     /**
+     * Add request matcher configuration
+     *
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    private function addRequestMatcherConfiguration(array $config, ContainerBuilder $container)
+    {
+        $decisionManager = $container->getDefinition('elao.error_notifier.decision_manager.request_match');
+
+        if (!empty($config['ignored404Paths'])) {
+            foreach ($config['ignored404Paths'] as $path) {
+                $decisionManager->addMethodCall(
+                    'addRequestMatcher',
+                    array(new Definition(new Parameter('elao.error_notifier.matcher.class'), array($path)))
+                );
+            }
+        }
+    }
+
+    /**
      * Add default mailer configuration
      *
      * @param array $config
@@ -115,7 +131,6 @@ class ElaoErrorNotifierExtension extends Extension
 
         $container
             ->getDefinition('elao.error_notifier.notifier.default_mailer')
-            ->addTag('elao.error_notifier', array('alias' => 'default_mailer'))
             ->replaceArgument(2, $to)
             ->replaceArgument(3, $from)
         ;

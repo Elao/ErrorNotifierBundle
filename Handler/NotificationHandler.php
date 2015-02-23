@@ -5,6 +5,7 @@ namespace Elao\ErrorNotifierBundle\Handler;
 use Elao\ErrorNotifierBundle\Configuration\Configuration;
 use Elao\ErrorNotifierBundle\Notifier\NotifierCollection;
 use Elao\ErrorNotifierBundle\Notifier\NotifierInterface;
+use Elao\ErrorNotifierBundle\Request\RequestMatchDecisionManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,13 +24,23 @@ class NotificationHandler implements NotificationHandlerInterface
     protected $notifierCollection;
 
     /**
+     * @var RequestMatchDecisionManagerInterface
+     */
+    protected $requestMatchDecisionManager;
+
+    /**
      * @param Configuration $configuration
      * @param NotifierCollection $notifierCollection
+     * @param RequestMatchDecisionManagerInterface $requestMatchDecisionManager
      */
-    public function __construct(Configuration $configuration, NotifierCollection $notifierCollection)
-    {
+    public function __construct(
+        Configuration $configuration,
+        NotifierCollection $notifierCollection,
+        RequestMatchDecisionManagerInterface $requestMatchDecisionManager
+    ) {
         $this->configuration = $configuration;
         $this->notifierCollection = $notifierCollection;
+        $this->requestMatchDecisionManager = $requestMatchDecisionManager;
     }
 
     /**
@@ -43,6 +54,10 @@ class NotificationHandler implements NotificationHandlerInterface
         InputInterface $commandInput = null
     ) {
         if ($this->isWithinRepeatTimeout($exception)) {
+            return null;
+        }
+
+        if ($request && $this->requestMatchDecisionManager->matches($request)) {
             return null;
         }
 

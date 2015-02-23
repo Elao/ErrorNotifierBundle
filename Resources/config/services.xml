@@ -5,7 +5,10 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
+        <parameter key="elao.error_notifier.matcher.class">Symfony\Component\HttpFoundation\RequestMatcher</parameter>
+
         <parameter key="elao.error_notifier.configuration.class">Elao\ErrorNotifierBundle\Configuration\Configuration</parameter>
+        <parameter key="elao.error_notifier.decision_manager.request_match.class">Elao\ErrorNotifierBundle\Request\RequestMatchDecisionManager</parameter>
         <parameter key="elao.error_notifier.exception_handler.class">Elao\ErrorNotifierBundle\Handler\ExceptionHandler</parameter>
         <parameter key="elao.error_notifier.listener.class">Elao\ErrorNotifierBundle\Listener\ExceptionListener</parameter>
         <parameter key="elao.error_notifier.notification_handler.class">Elao\ErrorNotifierBundle\Handler\NotificationHandler</parameter>
@@ -41,6 +44,7 @@
         <service id="elao.error_notifier.notification_handler" class="%elao.error_notifier.notification_handler.class%">
             <argument type="service" id="elao.error_notifier.configuration" />
             <argument type="service" id="elao.error_notifier.notifier_collection" />
+            <argument type="service" id="elao.error_notifier.decision_manager.request_match" />
         </service>
 
         <service id="elao.error_notifier.notifier_collection" class="%elao.error_notifier.notifier_collection.class%">
@@ -51,12 +55,15 @@
             <tag name="twig.extension" />
         </service>
 
+        <service id="elao.error_notifier.decision_manager.request_match" class="%elao.error_notifier.decision_manager.request_match.class%" />
+
 
         <service id="elao.error_notifier.notifier.default_mailer" class="%elao.error_notifier.notifier.default_mailer.class%">
             <argument type="service" id="mailer" />
             <argument type="service" id="templating" />
             <argument />    <!-- to -->
             <argument />    <!-- from -->
+            <tag name="elao.error_notifier" alias="default_mailer" />
         </service>
     </services>
 

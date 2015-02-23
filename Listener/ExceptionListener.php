@@ -41,7 +41,7 @@ class ExceptionListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $this->exceptionHandler->initializeHandler($event->getRequest());
+    //    $this->exceptionHandler->initializeHandler($event->getRequest());
     }
 
     /**
@@ -63,6 +63,7 @@ class ExceptionListener
             return;
         }
 
+        $this->exceptionHandler->initializeHandler($event->getRequest());
         $this->exceptionHandler->handleException($event->getException());
     }
 

@@ -43,8 +43,10 @@ class ExceptionHandler implements ExceptionHandlerInterface
      * @param Configuration $configuration
      * @param NotificationHandlerInterface $notificationHandler
      */
-    public function __construct(Configuration $configuration, NotificationHandlerInterface $notificationHandler)
-    {
+    public function __construct(
+        Configuration $configuration,
+        NotificationHandlerInterface $notificationHandler
+    ) {
         $this->configuration = $configuration;
         $this->notificationHandler = $notificationHandler;
 
@@ -136,7 +138,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
             return;
         }
 
-        $this->notificationHandler->notify($flattened, $request, null, $this->command, $this->commandInput);
+        $this->notificationHandler->notify($flattened, $this->request, null, $this->command, $this->commandInput);
     }
 
     /**
