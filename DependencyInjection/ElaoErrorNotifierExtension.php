@@ -4,7 +4,9 @@ namespace Elao\ErrorNotifierBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -13,7 +15,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 /**
  * ElaoErrorNotifier Extension
  */
-class ElaoErrorNotifierExtension extends Extension
+class ElaoErrorNotifierExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * load configuration
@@ -53,6 +55,8 @@ class ElaoErrorNotifierExtension extends Extension
             $this->addMailerConfiguration($config, $container);
         }
 
+        if ($this->isNotifierEnabled('default_slack', $enabledNotifiers)) {
+            $this->addSlackConfiguration($config['notifiers']['slack'], $container);
         }
 
         $container
@@ -141,6 +145,46 @@ class ElaoErrorNotifierExtension extends Extension
                 ->replaceArgument(0, new Reference($config['mailer']))
             ;
         }
+    }
 
+    /**
+     * Add slack notifier configuration
+     *
+     * @param array $config
+     * @param ContainerBuilder $container
+     * @throws \Exception
+     */
+    private function addSlackConfiguration(array $config, ContainerBuilder $container)
+    {
+        foreach (array('api_token', 'channel') as $field) {
+            if (!$config[$field]) {
+                throw new InvalidConfigurationException(sprintf(
+                    'elao_error_notifier.notifiers.slack.%s must be set if default_slack is enabled',
+                    $field
+                ));
+            }
+        }
+
+        $container
+            ->getDefinition('elao.error_notifier.notifier.default_slack')
+            ->replaceArgument(2, $config['channel'])
+        ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        $bundles = $container->getParameter('kernel.bundles');
+
+        $configs = $container->getExtensionConfig($this->getAlias());
+        $config = $this->processConfiguration(new Configuration(), $configs);
+
+        $clSlackApiToken = $config['notifiers']['slack']['api_token'];
+
+        if (isset($bundles['CLSlackBundle']) && $clSlackApiToken) {
+            $container->prependExtensionConfig('cl_slack', array('api_token' => $clSlackApiToken));
+        }
     }
 }

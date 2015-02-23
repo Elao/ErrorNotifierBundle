@@ -1,0 +1,12 @@
+{% spaceless %}
+
+*{{ exception.message }}*
+```
+{{ exception.statusCode }}: {{ exception.class }}
+Generated At: {{ "now"|date("d-m-Y H:i:s") }}
+Message: {{ exception.message }}
+{% if request %}Uri: {{ request.uri }}{% endif %}
+{% if command %}Command: {{ command.name }}{% endif %}
+```
+
+{% endspaceless %}

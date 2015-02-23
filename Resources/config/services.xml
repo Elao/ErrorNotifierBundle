@@ -15,6 +15,7 @@
         <parameter key="elao.error_notifier.notifier_collection.class">Elao\ErrorNotifierBundle\Notifier\NotifierCollection</parameter>
 
         <parameter key="elao.error_notifier.notifier.default_mailer.class">Elao\ErrorNotifierBundle\Notifier\MailerNotifier</parameter>
+        <parameter key="elao.error_notifier.notifier.default_slack.class">Elao\ErrorNotifierBundle\Notifier\SlackNotifier</parameter>
     </parameters>
 
     <services>
@@ -64,6 +65,15 @@
             <argument />    <!-- to -->
             <argument />    <!-- from -->
             <tag name="elao.error_notifier" alias="default_mailer" />
+        </service>
+
+        <service id="elao.error_notifier.notifier.default_slack" class="%elao.error_notifier.notifier.default_slack.class%">
+            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="templating" />
+            <argument />    <!-- channel -->
+            <argument type="service" id="cl_slack.payload_factory" on-invalid="null" />
+            <argument type="service" id="cl_slack.api_client" on-invalid="null" />
+            <tag name="elao.error_notifier" alias="default_slack" />
         </service>
     </services>
 

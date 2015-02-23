@@ -480,7 +480,7 @@
                             <h4>Request GET Parameters</h4>
 
                             {% if request.query.all|length %}
-                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.query } only %}
+                                {% include 'ElaoErrorNotifierBundle:Mailer:_bag.html.twig' with { 'bag': request.query } only %}
                             {% else %}
                                 <p>
                                     <em>No GET parameters</em>
@@ -503,7 +503,7 @@
                             <h4>Request POST Parameters</h4>
 
                             {% if request.request.all|length %}
-                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.request } only %}
+                                {% include 'ElaoErrorNotifierBundle:Mailer:_bag.html.twig' with { 'bag': request.request } only %}
                             {% else %}
                                 <p>
                                     <em>No POST parameters</em>
@@ -526,7 +526,7 @@
                             <h4>Request Attributes</h4>
 
                             {% if request.attributes.all|length %}
-                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.attributes } only %}
+                                {% include 'ElaoErrorNotifierBundle:Mailer:_bag.html.twig' with { 'bag': request.attributes } only %}
                             {% else %}
                                 <p>
                                     <em>No Request Attributes</em>
@@ -549,7 +549,7 @@
                             <h4>Request Cookies</h4>
 
                             {% if request.cookies.all|length %}
-                                {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.cookies } only %}
+                                {% include 'ElaoErrorNotifierBundle:Mailer:_bag.html.twig' with { 'bag': request.cookies } only %}
                             {% else %}
                                 <p>
                                     <em>No Request Cookies</em>
@@ -570,7 +570,7 @@
                     <tr>
                         <td>
                             <h4>Request Headers</h4>
-                            {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.headers } only %}
+                            {% include 'ElaoErrorNotifierBundle:Mailer:_bag.html.twig' with { 'bag': request.headers } only %}
                         </td>
                     </tr>
                 </table>
@@ -586,7 +586,7 @@
                     <tr>
                         <td>
                             <h4>Request Server Parameters </h4>
-                            {% include 'ElaoErrorNotifierBundle::_bag.html.twig' with { 'bag': request.server } only %}
+                            {% include 'ElaoErrorNotifierBundle:Mailer:_bag.html.twig' with { 'bag': request.server } only %}
                         </td>
                     </tr>
                 </table>
