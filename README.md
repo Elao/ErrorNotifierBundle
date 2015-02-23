@@ -85,8 +85,11 @@ elao_error_notifier:
 ```
 
 ### How to setup another mailer for sending the error mail
+
 The mailer option has been added to let the application send the error mail via local smtp instead of using the regular quota on 3rd mailer services.
+
 For example, if you wish to use an custom mailer that send mails via your server mail transport, create this one in the `config.yml` of your project:
+
 ```yml
 # app/config/config.yml
 swiftmailer:
@@ -147,7 +150,7 @@ elao_error_notifier:
 
 ### How to send error via email?
 
-Enter the email addresses you wish to mail from and to (this can either be a string from 1 recipient or and array for multiple) and add the notifier `default_mailer` to your `enabled_notifiers` list.
+Enter the email addresses you wish to mail from and to (this can either be a string from 1 recipient or an array for multiple) and add the notifier `default_mailer` to your `enabled_notifiers` list.
 
 ```yml
 # app/config/config_prod.yml
@@ -157,7 +160,7 @@ elao_error_notifier:
     # mailer configurations at root are for backward compatability
     # and may be dropped so it is best to avoid
     enabled_notifiers:
-        - default_slack
+        - default_mailer
     notifier:
         mailer:
             from: from@example.com
