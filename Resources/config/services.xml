@@ -71,7 +71,6 @@
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="templating" />
             <argument />    <!-- channel -->
-            <argument type="service" id="cl_slack.payload_factory" on-invalid="null" />
             <argument type="service" id="cl_slack.api_client" on-invalid="null" />
             <tag name="elao.error_notifier" alias="default_slack" />
         </service>

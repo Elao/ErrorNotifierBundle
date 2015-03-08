@@ -2,8 +2,8 @@
 
 namespace Elao\ErrorNotifierBundle\Notifier;
 
+use CL\Slack\Payload\ChatPostMessagePayload;
 use CL\Slack\Transport\ApiClient;
-use CL\Slack\Util\PayloadFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,11 +29,6 @@ class SlackNotifier implements NotifierInterface
     protected $channel;
 
     /**
-     * @var PayloadFactory
-     */
-    protected $payloadFactory;
-
-    /**
      * @var ApiClient
      */
     protected $apiClient;
@@ -42,18 +37,15 @@ class SlackNotifier implements NotifierInterface
      * @param TokenStorageInterface $tokenStorage
      * @param EngineInterface $templating
      * @param $channel
-     * @param PayloadFactory $payloadFactory
      * @param ApiClient $apiClient
      */
     public function __construct(
         TokenStorageInterface $tokenStorage,
         EngineInterface $templating,
         $channel,
-        PayloadFactory $payloadFactory = null,
         ApiClient $apiClient = null
     ) {
         $this->tokenStorage     = $tokenStorage;
-        $this->payloadFactory   = $payloadFactory;
         $this->apiClient        = $apiClient;
         $this->templating       = $templating;
 
@@ -85,7 +77,7 @@ class SlackNotifier implements NotifierInterface
             'command_input'   => $commandInput
         ));
 
-        $payload = $this->payloadFactory->chatPostMessage(
+        $payload = new ChatPostMessagePayload(
             $this->channel,
             $text,
             sprintf('%s (bot)', $this->getUsername($exception)),
@@ -103,17 +95,10 @@ class SlackNotifier implements NotifierInterface
      */
     private function assertClSlackInstalled()
     {
-        $expected = array(
-            $this->payloadFactory,
-            $this->apiClient,
-        );
-
-        foreach ($expected as $expects) {
-            if (null === $expects) {
-                throw new \Exception(
-                    'Please make sure that you have installed and enabled the CLSlackBundle (cleentfaar/slack-bundle)'
-                );
-            }
+        if (null === $this->apiClient) {
+            throw new \Exception(
+                'Please make sure that you have installed and enabled the CLSlackBundle (cleentfaar/slack-bundle)'
+            );
         }
     }
 

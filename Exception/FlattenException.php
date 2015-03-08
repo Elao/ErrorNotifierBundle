@@ -11,6 +11,11 @@ class FlattenException
 
     private $handler;
 
+    /**
+     * @param $method
+     * @param $args
+     * @return \Symfony\Component\Debug\Exception\FlattenException|\Symfony\Component\Debug\Exception\FlattenException
+     */
     public static function __callStatic($method, $args)
     {
         if (class_exists(self::DEBUG_FLATTEN) && method_exists(self::DEBUG_FLATTEN, $method)) {
@@ -24,6 +29,11 @@ class FlattenException
         throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_called_class(), $method));
     }
 
+    /**
+     * @param $method
+     * @param $args
+     * @return \Symfony\Component\Debug\Exception\FlattenException|\Symfony\Component\Debug\Exception\FlattenException
+     */
     public function __call($method, $args)
     {
         $reflection = null;
