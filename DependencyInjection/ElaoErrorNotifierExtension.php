@@ -2,8 +2,11 @@
 
 namespace Elao\ErrorNotifierBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -12,9 +15,8 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 /**
  * ElaoErrorNotifier Extension
  */
-class ElaoErrorNotifierExtension extends Extension
+class ElaoErrorNotifierExtension extends Extension implements PrependExtensionInterface
 {
-
     /**
      * load configuration
      *
@@ -26,18 +28,163 @@ class ElaoErrorNotifierExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
+        $config = $this->processConfiguration($configuration, $configs);
 
-        if (count($configs[0])) {
-            $config = $this->processConfiguration($configuration, $configs);
+        $enabledNotifiers = $config['enabled_notifiers'];
 
-            $container->setParameter('elao.error_notifier.config', $config);
+        if (empty($enabledNotifiers)) {
+            return;
+        }
 
-            $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config/')));
-            $loader->load('services.xml');
+        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config/')));
+        $loader->load('services.xml');
 
-            if ($config['mailer'] != 'mailer') {
-                $container->getDefinition('elao.error_notifier.listener')->replaceArgument(0, new Reference($config['mailer']));
+        $container
+            ->getDefinition('elao.error_notifier.configuration')
+            ->replaceArgument(1, $config['handle404'])
+            ->replaceArgument(2, $config['handlePHPErrors'])
+            ->replaceArgument(3, $config['handlePHPWarnings'])
+            ->replaceArgument(4, $config['handleSilentErrors'])
+            ->replaceArgument(5, $config['repeatTimeout'])
+            ->replaceArgument(6, $config['ignoredClasses'])
+        ;
+
+        $this->addRequestMatcherConfiguration($config, $container);
+
+        if ($this->isNotifierEnabled('default_mailer', $enabledNotifiers)) {
+            $this->addMailerConfiguration($config, $container);
+        }
+
+        if ($this->isNotifierEnabled('default_slack', $enabledNotifiers)) {
+            $this->addSlackConfiguration($config['notifiers']['slack'], $container);
+        }
+
+        $container
+            ->getDefinition('elao.error_notifier.notifier_collection')
+            ->replaceArgument(0, $enabledNotifiers)
+        ;
+    }
+
+    /**
+     * Validate given emails
+     *
+     * @param array $emails
+     * @param string $field
+     * @throws InvalidConfigurationException
+     */
+    private function validateEmails($emails, $field)
+    {
+        if (!is_array($emails)) {
+            $emails = array($emails);
+        }
+
+        foreach ($emails as $email) {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new InvalidConfigurationException(sprintf(
+                    'Invalid configuration for path "elao_error_notifier.%s": This must '.
+                    'be a valid email address if "default_mailer" is in the enabled_notifiers',
+                    $field
+                ), 500);
             }
+        }
+    }
+
+    /**
+     * @param $notifier
+     * @param array $enabledNotifiers
+     * @return bool
+     */
+    private function isNotifierEnabled($notifier, array $enabledNotifiers)
+    {
+        return in_array($notifier, $enabledNotifiers);
+    }
+
+    /**
+     * Add request matcher configuration
+     *
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    private function addRequestMatcherConfiguration(array $config, ContainerBuilder $container)
+    {
+        $decisionManager = $container->getDefinition('elao.error_notifier.decision_manager.request_match');
+
+        if (!empty($config['ignored404Paths'])) {
+            foreach ($config['ignored404Paths'] as $path) {
+                $decisionManager->addMethodCall(
+                    'addRequestMatcher',
+                    array(new Definition(new Parameter('elao.error_notifier.matcher.class'), array($path)))
+                );
+            }
+        }
+    }
+
+    /**
+     * Add default mailer configuration
+     *
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    private function addMailerConfiguration(array $config, ContainerBuilder $container)
+    {
+        $to = !empty($config['to']) ? $config['to'] : $config['notifiers']['mailer']['to'];
+        $from = !empty($config['from']) ? $config['from'] :$config['notifiers']['mailer']['from'];
+
+        $this->validateEmails($to, 'to');
+        $this->validateEmails($from, 'from');
+
+        $container
+            ->getDefinition('elao.error_notifier.notifier.default_mailer')
+            ->replaceArgument(2, $to)
+            ->replaceArgument(3, $from)
+        ;
+
+        if ($config['mailer'] != 'mailer') {
+            $container
+                ->getDefinition('elao.error_notifier.notifier.default_mailer')
+                ->replaceArgument(0, new Reference($config['mailer']))
+            ;
+        }
+    }
+
+    /**
+     * Add slack notifier configuration
+     *
+     * @param array $config
+     * @param ContainerBuilder $container
+     * @throws \Exception
+     */
+    private function addSlackConfiguration(array $config, ContainerBuilder $container)
+    {
+        foreach (array('api_token', 'channel') as $field) {
+            if (!$config[$field]) {
+                throw new InvalidConfigurationException(sprintf(
+                    'elao_error_notifier.notifiers.slack.%s must be set if default_slack is enabled',
+                    $field
+                ));
+            }
+        }
+
+        $container
+            ->getDefinition('elao.error_notifier.notifier.default_slack')
+            ->replaceArgument(2, $config['channel'])
+        ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        $bundles = $container->getParameter('kernel.bundles');
+
+        $configs = $container->getExtensionConfig($this->getAlias());
+        $config = $this->processConfiguration(new Configuration(), $configs);
+
+        $clSlackApiToken = $config['notifiers']['slack']['api_token'];
+
+        if (isset($bundles['CLSlackBundle']) && $clSlackApiToken) {
+            $container->prependExtensionConfig('cl_slack', array('api_token' => $clSlackApiToken));
         }
     }
 }

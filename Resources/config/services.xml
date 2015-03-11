@@ -5,23 +5,74 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="elao.error_notifier.listener.class">Elao\ErrorNotifierBundle\Listener\Notifier</parameter>
+        <parameter key="elao.error_notifier.matcher.class">Symfony\Component\HttpFoundation\RequestMatcher</parameter>
+
+        <parameter key="elao.error_notifier.configuration.class">Elao\ErrorNotifierBundle\Configuration\Configuration</parameter>
+        <parameter key="elao.error_notifier.decision_manager.request_match.class">Elao\ErrorNotifierBundle\Request\RequestMatchDecisionManager</parameter>
+        <parameter key="elao.error_notifier.exception_handler.class">Elao\ErrorNotifierBundle\Handler\ExceptionHandler</parameter>
+        <parameter key="elao.error_notifier.listener.class">Elao\ErrorNotifierBundle\Listener\ExceptionListener</parameter>
+        <parameter key="elao.error_notifier.notification_handler.class">Elao\ErrorNotifierBundle\Handler\NotificationHandler</parameter>
+        <parameter key="elao.error_notifier.notifier_collection.class">Elao\ErrorNotifierBundle\Notifier\NotifierCollection</parameter>
+
+        <parameter key="elao.error_notifier.notifier.default_mailer.class">Elao\ErrorNotifierBundle\Notifier\MailerNotifier</parameter>
+        <parameter key="elao.error_notifier.notifier.default_slack.class">Elao\ErrorNotifierBundle\Notifier\SlackNotifier</parameter>
     </parameters>
 
     <services>
+        <service id="elao.error_notifier.configuration" class="%elao.error_notifier.configuration.class%">
+            <argument>%kernel.cache_dir%</argument>
+            <argument />    <!-- handle404 -->
+            <argument />    <!-- handlePHPErrors -->
+            <argument />    <!-- handlePHPWarnings -->
+            <argument />    <!-- handleSilentErrors -->
+            <argument />    <!-- repeatTimeout -->
+            <argument />    <!-- ignoredClasses -->
+        </service>
+
+        <service id="elao.error_notifier.exception_handler" class="%elao.error_notifier.exception_handler.class%">
+            <argument type="service" id="elao.error_notifier.configuration" />
+            <argument type="service" id="elao.error_notifier.notification_handler" />
+        </service>
+
         <service id="elao.error_notifier.listener" class="%elao.error_notifier.listener.class%">
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="0"/>
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="0"/>
             <tag name="kernel.event_listener" event="console.exception" method="onConsoleException" priority="0"/>
             <tag name="kernel.event_listener" event="console.command" method="onConsoleCommand" priority="0"/>
-            <argument type="service" id="mailer" />
-            <argument type="service" id="templating" />
-            <argument>%kernel.cache_dir%</argument>
-            <argument>%elao.error_notifier.config%</argument>
+            <argument type="service" id="elao.error_notifier.exception_handler" />
+        </service>
+
+        <service id="elao.error_notifier.notification_handler" class="%elao.error_notifier.notification_handler.class%">
+            <argument type="service" id="elao.error_notifier.configuration" />
+            <argument type="service" id="elao.error_notifier.notifier_collection" />
+            <argument type="service" id="elao.error_notifier.decision_manager.request_match" />
+        </service>
+
+        <service id="elao.error_notifier.notifier_collection" class="%elao.error_notifier.notifier_collection.class%">
+            <argument />    <!-- enabled_notifiers -->
         </service>
 
         <service id="elao.error_notifier.dumpy_extension" class="Elao\ErrorNotifierBundle\Twig\DumpyTwigFilter">
             <tag name="twig.extension" />
+        </service>
+
+        <service id="elao.error_notifier.decision_manager.request_match" class="%elao.error_notifier.decision_manager.request_match.class%" />
+
+
+        <service id="elao.error_notifier.notifier.default_mailer" class="%elao.error_notifier.notifier.default_mailer.class%">
+            <argument type="service" id="mailer" />
+            <argument type="service" id="templating" />
+            <argument />    <!-- to -->
+            <argument />    <!-- from -->
+            <tag name="elao.error_notifier" alias="default_mailer" />
+        </service>
+
+        <service id="elao.error_notifier.notifier.default_slack" class="%elao.error_notifier.notifier.default_slack.class%">
+            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="templating" />
+            <argument />    <!-- channel -->
+            <argument type="service" id="cl_slack.api_client" on-invalid="null" />
+            <tag name="elao.error_notifier" alias="default_slack" />
         </service>
     </services>
 

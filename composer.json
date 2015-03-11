@@ -22,6 +22,10 @@
         "symfony/framework-bundle": "~2.0"
     },
 
+    "suggest": {
+        "cleentfaar/slack-bundle": "Fos use with default slack notifier"
+    },
+
     "autoload": {
         "psr-0": {
             "Elao\\ErrorNotifierBundle": "."
