@@ -60,17 +60,18 @@ class Notifier
      */
     public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $cacheDir, $config)
     {
-        $this->mailer         = $mailer;
-        $this->templating     = $templating;
-        $this->from           = $config['from'];
-        $this->to             = $config['to'];
-        $this->handle404      = $config['handle404'];
-        $this->reportErrors   = $config['handlePHPErrors'];
-        $this->reportWarnings = $config['handlePHPWarnings'];
-        $this->reportSilent   = $config['handleSilentErrors'];
-        $this->ignoredClasses = $config['ignoredClasses'];
-        $this->repeatTimeout  = $config['repeatTimeout'];
-        $this->errorsDir      = $cacheDir.'/errors';
+        $this->mailer           = $mailer;
+        $this->templating       = $templating;
+        $this->from             = $config['from'];
+        $this->to               = $config['to'];
+        $this->handle404        = $config['handle404'];
+        $this->handleHTTPcodes  = $config['handleHTTPcodes'];
+        $this->reportErrors     = $config['handlePHPErrors'];
+        $this->reportWarnings   = $config['handlePHPWarnings'];
+        $this->reportSilent     = $config['handleSilentErrors'];
+        $this->ignoredClasses   = $config['ignoredClasses'];
+        $this->repeatTimeout    = $config['repeatTimeout'];
+        $this->errorsDir        = $cacheDir.'/errors';
 
         if (!is_dir($this->errorsDir)) {
             mkdir($this->errorsDir);
@@ -91,7 +92,7 @@ class Notifier
         $exception = $event->getException();
 
         if ($exception instanceof HttpException) {
-            if (500 === $exception->getStatusCode() || (404 === $exception->getStatusCode() && true === $this->handle404)) {
+            if (500 === $exception->getStatusCode() || (404 === $exception->getStatusCode() && true === $this->handle404) || (in_array($exception->getStatusCode(), $this->handleHTTPcodes))) {
                 $this->createMailAndSend($exception, $event->getRequest());
             }
         } else {

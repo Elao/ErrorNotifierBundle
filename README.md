@@ -62,6 +62,7 @@ elao_error_notifier:
     from: from@example.com
     to: to@example.com
     handle404: true # default :  false
+    handleHTTPcodes: ~
     mailer: your.mailer.id # default : mailer
     handlePHPErrors: true # catch fatal erros and email them
     handlePHPWarnings: true # catch warnings and email them
@@ -102,6 +103,18 @@ Sometimes, you want the bundle not to send email for errors raised by a given cl
 elao_error_notifier:
     ignoredClasses:
         - "Guzzle\Http\Exception\ServerErrorResponseException"
+        - ...
+```
+
+### How to handle other HTTP errors by given error code ?
+
+If you want the bundle to send email for other HTTP errors than 500 and 404, you can now specify the list of error codes you want to handle.
+
+```yml
+# app/config/config_prod.yml
+elao_error_notifier:
+    handleHTTPcodes:
+        - 405
         - ...
 ```
 
