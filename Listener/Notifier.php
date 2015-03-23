@@ -41,6 +41,7 @@ class Notifier
     private $request;
     private $handle404;
     private $ignoredClasses;
+    private $ignoredPhpErrors;
     private $reportWarnings = false;
     private $reportErrors   = false;
     private $reportSilent   = false;
@@ -70,6 +71,7 @@ class Notifier
         $this->reportWarnings   = $config['handlePHPWarnings'];
         $this->reportSilent     = $config['handleSilentErrors'];
         $this->ignoredClasses   = $config['ignoredClasses'];
+        $this->ignoredPhpErrors = $config['ignoredPhpErrors'];
         $this->repeatTimeout    = $config['repeatTimeout'];
         $this->errorsDir        = $cacheDir.'/errors';
 
@@ -196,6 +198,10 @@ class Notifier
             return false;
         }
 
+        if(in_array($message, $this->ignoredPhpErrors)) {
+            return false;
+        }
+
         $exception = new \ErrorException(sprintf('%s: %s in %s line %d', $this->getErrorString($level), $message, $file, $line), 0, $level, $file, $line);
 
         $this->createMailAndSend($exception, $this->request, $errcontext, $this->command, $this->commandInput);
@@ -228,7 +234,7 @@ class Notifier
             $errors = array_merge($errors, array(E_CORE_WARNING, E_COMPILE_WARNING, E_STRICT));
         }
 
-        if (in_array($lastError['type'], $errors)) {
+        if (in_array($lastError['type'], $errors) && !in_array(@$lastError['message'], $this->ignoredPhpErrors)) {
             $exception = new \ErrorException(sprintf('%s: %s in %s line %d', @$this->getErrorString(@$lastError['type']), @$lastError['message'], @$lastError['file'], @$lastError['line']),  @$lastError['type'], @$lastError['type'], @$lastError['file'], @$lastError['line']);
             $this->createMailAndSend($exception, $this->request, null, $this->command, $this->commandInput);
         }

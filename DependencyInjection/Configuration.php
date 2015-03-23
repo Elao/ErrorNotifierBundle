@@ -57,6 +57,12 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('ignoredClasses')
                     ->prototype('scalar')
+                    ->end()
+                    ->treatNullLike(array())
+                ->end()
+                ->arrayNode('ignoredPhpErrors')
+                    ->prototype('scalar')
+                    ->end()
                     ->treatNullLike(array())
                 ->end()
             ->end();
