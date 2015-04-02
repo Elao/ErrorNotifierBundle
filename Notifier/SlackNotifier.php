@@ -77,12 +77,11 @@ class SlackNotifier implements NotifierInterface
             'command_input'   => $commandInput
         ));
 
-        $payload = new ChatPostMessagePayload(
-            $this->channel,
-            $text,
-            sprintf('%s (bot)', $this->getUsername($exception)),
-            ':skull:'
-        );
+        $payload = new ChatPostMessagePayload();
+        $payload->setChannel($this->channel);
+        $payload->setText($text);
+        $payload->setUsername(sprintf('%s (bot)', $this->getUsername($exception)));
+        $payload->setIconEmoji('skull');
 
         $response = $this->apiClient->send($payload);
     }
