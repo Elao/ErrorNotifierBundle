@@ -24,9 +24,15 @@ class Configuration implements ConfigurationInterface
 
         $root
             ->children()
-                ->scalarNode('to')
+                ->arrayNode('to')
+                    ->beforeNormalization()
+                    ->ifString()
+                        ->then(function($value) { return array($value); })
+                    ->end()
                     ->isRequired()
                     ->cannotBeEmpty()
+                    ->prototype('scalar')
+                    ->end()
                 ->end()
                 ->scalarNode('from')
                     ->isRequired()
