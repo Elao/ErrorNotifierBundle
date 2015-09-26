@@ -30,13 +30,16 @@ class ElaoErrorNotifierExtension extends Extension implements PrependExtensionIn
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config/')));
+        // Load Twig filters by default
+        $loader->load('twig.xml');
+
         $enabledNotifiers = $config['enabled_notifiers'];
 
         if (empty($enabledNotifiers)) {
             return;
         }
 
-        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config/')));
         $loader->load('services.xml');
 
         $container

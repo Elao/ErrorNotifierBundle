@@ -52,10 +52,6 @@
             <argument />    <!-- enabled_notifiers -->
         </service>
 
-        <service id="elao.error_notifier.dumpy_extension" class="Elao\ErrorNotifierBundle\Twig\DumpyTwigFilter">
-            <tag name="twig.extension" />
-        </service>
-
         <service id="elao.error_notifier.decision_manager.request_match" class="%elao.error_notifier.decision_manager.request_match.class%" />
 
 
