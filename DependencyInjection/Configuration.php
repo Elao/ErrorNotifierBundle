@@ -71,6 +71,11 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->treatNullLike(array())
                 ->end()
+                ->arrayNode('ignoredIPs')
+                    ->prototype('scalar')
+                    ->end()
+                    ->treatNullLike(array())
+                ->end()
             ->end();
 
         return $treeBuilder;
