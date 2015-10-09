@@ -46,6 +46,7 @@ class Notifier
     private $reportErrors   = false;
     private $reportSilent   = false;
     private $repeatTimeout  = false;
+    private $ignoredIPs;
     private $command;
     private $commandInput;
 
@@ -74,6 +75,7 @@ class Notifier
         $this->ignoredPhpErrors = $config['ignoredPhpErrors'];
         $this->repeatTimeout    = $config['repeatTimeout'];
         $this->errorsDir        = $cacheDir.'/errors';
+        $this->ignoredIPs       = $config['ignoredIPs'];
 
         if (!is_dir($this->errorsDir)) {
             mkdir($this->errorsDir);
@@ -94,6 +96,10 @@ class Notifier
         $exception = $event->getException();
 
         if ($exception instanceof HttpException) {
+            if (in_array($event->getRequest()->getClientIp(), $this->ignoredIPs)) {
+                return;
+            }
+
             if (500 === $exception->getStatusCode() || (404 === $exception->getStatusCode() && true === $this->handle404) || (in_array($exception->getStatusCode(), $this->handleHTTPcodes))) {
                 $this->createMailAndSend($exception, $event->getRequest());
             }

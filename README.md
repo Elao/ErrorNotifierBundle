@@ -156,6 +156,17 @@ You may control the depth of recursion with a parameter, say foo = array('a'=>ar
 
 Default value is 1. (MAX_DEPTH const)
 
+### How to ignore sending HTTP errors if request comes from given IPs ?
+
+If you want to ignore sending HTTP errors if the request comes from specific IPs, you can now specify the list of ignored IPs.
+
+```yml
+# app/config/config_prod.yml
+elao_error_notifier:
+    ignoredIPs:
+        - "178.63.45.100"
+        - ...
+```
 
 ## Screenshot
 
