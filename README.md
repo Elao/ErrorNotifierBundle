@@ -156,7 +156,7 @@ You may control the depth of recursion with a parameter, say foo = array('a'=>ar
 
 Default value is 1. (MAX_DEPTH const)
 
-### How to ignore sending HTTP errors if request comes from given IPs ?
+### How to ignore sending HTTP errors if request comes from any of given IPs ?
 
 If you want to ignore sending HTTP errors if the request comes from specific IPs, you can now specify the list of ignored IPs.
 
@@ -166,6 +166,29 @@ elao_error_notifier:
     ignoredIPs:
         - "178.63.45.100"
         - ...
+
+### How to ignore sending HTTP errors if the user agent match a given pattern?
+
+For some reasons you may need to ignore sending notifications if request comes from some user agents.
+Often you will need to use this feature with annoying crawlers which uses artificial intelligence 
+to generate URLs which may not exist in your site.
+
+```yml
+# app/config/config_prod.yml
+elao_error_notifier:
+    ignoredAgentsPattern: "(Googlebot|bingbot)"
+
+```
+
+### How to ignore sending HTTP errors if the URI match a given pattern?
+
+For example if you want to ignore all not exist images errors you may do something like that.
+
+```yml
+# app/config/config_prod.yml
+elao_error_notifier:
+    ignoredUrlsPattern: "\.(jpg|png|gif)"
+
 ```
 
 ## Screenshot
