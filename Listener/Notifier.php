@@ -104,18 +104,14 @@ class Notifier
                 return;
             }
 
-            if (strlen($this->ignoredAgentsPattern))
-            {
-                if (preg_match('#'.$this->ignoredAgentsPattern.'#', $event->getRequest()->headers->get('User-Agent')))
-                {
+            if (strlen($this->ignoredAgentsPattern)) {
+                if (preg_match('#'.$this->ignoredAgentsPattern.'#', $event->getRequest()->headers->get('User-Agent'))) {
                     return;
                 }
             }
-            
-            if (strlen($this->ignoredUrlsPattern))
-            {
-                if (preg_match('#'.$this->ignoredUrlsPattern.'#', $event->getRequest()->getUri()))
-                {
+
+            if (strlen($this->ignoredUrlsPattern)) {
+                if (preg_match('#'.$this->ignoredUrlsPattern.'#', $event->getRequest()->getUri())) {
                     return;
                 }
             }
