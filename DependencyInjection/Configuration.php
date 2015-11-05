@@ -76,6 +76,12 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->treatNullLike(array())
                 ->end()
+                ->scalarNode('ignoredAgentsPattern')
+                    ->defaultValue('')
+                ->end()
+                ->scalarNode('ignoredUrlsPattern')
+                    ->defaultValue('')
+                ->end()
             ->end();
 
         return $treeBuilder;

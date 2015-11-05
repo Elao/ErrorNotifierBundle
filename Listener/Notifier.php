@@ -47,6 +47,8 @@ class Notifier
     private $reportSilent   = false;
     private $repeatTimeout  = false;
     private $ignoredIPs;
+    private $ignoredAgentsPattern;
+    private $ignoredUrlsPattern;
     private $command;
     private $commandInput;
 
@@ -62,20 +64,22 @@ class Notifier
      */
     public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $cacheDir, $config)
     {
-        $this->mailer           = $mailer;
-        $this->templating       = $templating;
-        $this->from             = $config['from'];
-        $this->to               = $config['to'];
-        $this->handle404        = $config['handle404'];
-        $this->handleHTTPcodes  = $config['handleHTTPcodes'];
-        $this->reportErrors     = $config['handlePHPErrors'];
-        $this->reportWarnings   = $config['handlePHPWarnings'];
-        $this->reportSilent     = $config['handleSilentErrors'];
-        $this->ignoredClasses   = $config['ignoredClasses'];
-        $this->ignoredPhpErrors = $config['ignoredPhpErrors'];
-        $this->repeatTimeout    = $config['repeatTimeout'];
-        $this->errorsDir        = $cacheDir.'/errors';
-        $this->ignoredIPs       = $config['ignoredIPs'];
+        $this->mailer               = $mailer;
+        $this->templating           = $templating;
+        $this->from                 = $config['from'];
+        $this->to                   = $config['to'];
+        $this->handle404            = $config['handle404'];
+        $this->handleHTTPcodes      = $config['handleHTTPcodes'];
+        $this->reportErrors         = $config['handlePHPErrors'];
+        $this->reportWarnings       = $config['handlePHPWarnings'];
+        $this->reportSilent         = $config['handleSilentErrors'];
+        $this->ignoredClasses       = $config['ignoredClasses'];
+        $this->ignoredPhpErrors     = $config['ignoredPhpErrors'];
+        $this->repeatTimeout        = $config['repeatTimeout'];
+        $this->errorsDir            = $cacheDir . '/errors';
+        $this->ignoredIPs           = $config['ignoredIPs'];
+        $this->ignoredAgentsPattern = $config['ignoredAgentsPattern'];
+        $this->ignoredUrlsPattern   = $config['ignoredUrlsPattern'];
 
         if (!is_dir($this->errorsDir)) {
             mkdir($this->errorsDir);
@@ -98,6 +102,18 @@ class Notifier
         if ($exception instanceof HttpException) {
             if (in_array($event->getRequest()->getClientIp(), $this->ignoredIPs)) {
                 return;
+            }
+
+            if (strlen($this->ignoredAgentsPattern)) {
+                if (preg_match('#'.$this->ignoredAgentsPattern.'#', $event->getRequest()->headers->get('User-Agent'))) {
+                    return;
+                }
+            }
+
+            if (strlen($this->ignoredUrlsPattern)) {
+                if (preg_match('#'.$this->ignoredUrlsPattern.'#', $event->getRequest()->getUri())) {
+                    return;
+                }
             }
 
             if (500 === $exception->getStatusCode() || (404 === $exception->getStatusCode() && true === $this->handle404) || (in_array($exception->getStatusCode(), $this->handleHTTPcodes))) {
