@@ -105,14 +105,14 @@ class DumpyTwigFilter extends \Twig_Extension
      * @param  int          $recursionDepth    The depth of recursion (used internally)
      * @return array|string
      */
-    public function sanitize ($value, $maxRecursionDepth = self::MAX_DEPTH, $recursionDepth = 0)
+    public function sanitize($value, $maxRecursionDepth = self::MAX_DEPTH, $recursionDepth = 0)
     {
         if (is_resource($value)) {
             return 'Resource';
         }
 
         if (is_array($value)) {
-            return $this->sanitizeIterateable ($value, $maxRecursionDepth, $recursionDepth);
+            return $this->sanitizeIterateable($value, $maxRecursionDepth, $recursionDepth);
         }
 
         if ($value instanceof InvokerException) {
@@ -148,7 +148,7 @@ class DumpyTwigFilter extends \Twig_Extension
                 $data = array();
                 $data['class'] = '<span title="' . $class->getName(). '">' . $class->getShortName() . '</span>';
                 if ($class->isIterateable()) {
-                    $data['iterateable'] = $this->sanitizeIterateable ($value, $maxRecursionDepth, $recursionDepth);
+                    $data['iterateable'] = $this->sanitizeIterateable($value, $maxRecursionDepth, $recursionDepth);
                 } else {
                     $data['accessors'] = array();
                     foreach ($class->getMethods() as $method) {
@@ -205,7 +205,7 @@ class DumpyTwigFilter extends \Twig_Extension
         return $value;
     }
 
-    public function sanitizeIterateable ($value, $maxRecursionDepth = self::MAX_DEPTH, $recursionDepth = 0)
+    public function sanitizeIterateable($value, $maxRecursionDepth = self::MAX_DEPTH, $recursionDepth = 0)
     {
         if ($recursionDepth < $maxRecursionDepth) {
             $r = array ();
@@ -215,15 +215,16 @@ class DumpyTwigFilter extends \Twig_Extension
             foreach ($value as $k => $v) {
                 $r[$k] = $this->sanitize($v, $maxRecursionDepth, $recursionDepth + 1);
                 $count++;
-                if($count >= 20) {
+                if ($count >= 20) {
                     $r[] = sprintf('... and %s more ...', ($arrayCount - $count));
                     break;
                 }
             }
-            
+
             return $r;
         } else {
-            $c = count($value); $t = gettype($value);
+            $c = count($value);
+            $t = gettype($value);
 
             return $c ? "$t of $c" : "empty $t";
         }

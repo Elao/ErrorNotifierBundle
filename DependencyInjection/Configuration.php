@@ -27,7 +27,9 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('to')
                     ->beforeNormalization()
                     ->ifString()
-                        ->then(function($value) { return array($value); })
+                        ->then(function ($value) {
+                            return array($value);
+                        })
                     ->end()
                     ->isRequired()
                     ->cannotBeEmpty()

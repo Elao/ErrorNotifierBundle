@@ -2,7 +2,7 @@
 
 namespace Elao\ErrorNotifierBundle\Listener;
 
-use \Swift_Mailer;
+use Swift_Mailer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,14 +20,13 @@ use Symfony\Component\Debug\Exception\FlattenException;
  */
 class Notifier
 {
-
     /**
-     * @var Swift_Mailer $mailer
+     * @var Swift_Mailer
      */
     private $mailer;
 
     /**
-     * @var EngineInterface $templating
+     * @var EngineInterface
      */
     private $templating;
 
@@ -198,10 +197,10 @@ class Notifier
     /**
      * @see http://php.net/set_error_handler
      *
-     * @param integer $level
-     * @param string  $message
-     * @param string  $file
-     * @param integer $line
+     * @param int    $level
+     * @param string $message
+     * @param string $file
+     * @param int    $line
      *
      * @throws ErrorException
      */
@@ -220,7 +219,7 @@ class Notifier
             return false;
         }
 
-        if(in_array($message, $this->ignoredPhpErrors)) {
+        if (in_array($message, $this->ignoredPhpErrors)) {
             return false;
         }
 
@@ -257,7 +256,7 @@ class Notifier
         }
 
         if (in_array($lastError['type'], $errors) && !in_array(@$lastError['message'], $this->ignoredPhpErrors)) {
-            $exception = new \ErrorException(sprintf('%s: %s in %s line %d', @$this->getErrorString(@$lastError['type']), @$lastError['message'], @$lastError['file'], @$lastError['line']),  @$lastError['type'], @$lastError['type'], @$lastError['file'], @$lastError['line']);
+            $exception = new \ErrorException(sprintf('%s: %s in %s line %d', @$this->getErrorString(@$lastError['type']), @$lastError['message'], @$lastError['file'], @$lastError['line']), @$lastError['type'], @$lastError['type'], @$lastError['file'], @$lastError['line']);
             $this->createMailAndSend($exception, $this->request, null, $this->command, $this->commandInput);
         }
     }
@@ -317,12 +316,12 @@ class Notifier
             'command_input'   => $commandInput
         ));
 
-        if($this->request) {
-            $subject = '[' . $request->headers->get('host') . '] Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
-        } elseif($this->command) {
-            $subject = '[' . $this->command->getName() . '] Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
+        if ($this->request) {
+            $subject = '['.$request->headers->get('host').'] Error '.$exception->getStatusCode().': '.$exception->getMessage();
+        } elseif ($this->command) {
+            $subject = '['.$this->command->getName().'] Error '.$exception->getStatusCode().': '.$exception->getMessage();
         } else {
-            $subject = 'Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
+            $subject = 'Error '.$exception->getStatusCode().': '.$exception->getMessage();
         }
 
         if (function_exists('mb_substr')) {
@@ -373,5 +372,4 @@ class Notifier
     {
         self::$tmpBuffer = '';
     }
-
 }
