@@ -1,19 +1,27 @@
 <?php
 
+/*
+ * This file is part of the Elao ErrorNotifier Bundle
+ *
+ * Copyright (C) Elao
+ *
+ * @author Elao <contact@elao.com>
+ */
+
 namespace Elao\ErrorNotifierBundle\Listener;
 
 use Swift_Mailer;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Templating\EngineInterface;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleExceptionEvent;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Templating\EngineInterface;
 
 /**
  * Notifier
@@ -104,13 +112,13 @@ class Notifier
             }
 
             if (strlen($this->ignoredAgentsPattern)) {
-                if (preg_match('#'.$this->ignoredAgentsPattern.'#', $event->getRequest()->headers->get('User-Agent'))) {
+                if (preg_match('#' . $this->ignoredAgentsPattern . '#', $event->getRequest()->headers->get('User-Agent'))) {
                     return;
                 }
             }
 
             if (strlen($this->ignoredUrlsPattern)) {
-                if (preg_match('#'.$this->ignoredUrlsPattern.'#', $event->getRequest()->getUri())) {
+                if (preg_match('#' . $this->ignoredUrlsPattern . '#', $event->getRequest()->getUri())) {
                     return;
                 }
             }
@@ -171,7 +179,7 @@ class Notifier
     {
         $this->request = null;
 
-        $this->command = $event->getCommand();
+        $this->command      = $event->getCommand();
         $this->commandInput = $event->getInput();
 
         if ($this->reportErrors || $this->reportWarnings) {
@@ -264,7 +272,8 @@ class Notifier
     /**
      * Convert the error code to a readable format
      *
-     * @param  integer $errorNo
+     * @param int $errorNo
+     *
      * @return string
      */
     public function getErrorString($errorNo)
@@ -313,15 +322,15 @@ class Notifier
             'status_code'     => $exception->getCode(),
             'context'         => $context,
             'command'         => $command,
-            'command_input'   => $commandInput
+            'command_input'   => $commandInput,
         ));
 
         if ($this->request) {
-            $subject = '['.$request->headers->get('host').'] Error '.$exception->getStatusCode().': '.$exception->getMessage();
+            $subject = '[' . $request->headers->get('host') . '] Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
         } elseif ($this->command) {
-            $subject = '['.$this->command->getName().'] Error '.$exception->getStatusCode().': '.$exception->getMessage();
+            $subject = '[' . $this->command->getName() . '] Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
         } else {
-            $subject = 'Error '.$exception->getStatusCode().': '.$exception->getMessage();
+            $subject = 'Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
         }
 
         if (function_exists('mb_substr')) {
@@ -343,13 +352,14 @@ class Notifier
     /**
      * Check last send time
      *
-     * @param  FlattenException $exception
+     * @param FlattenException $exception
+     *
      * @return bool
      */
     private function checkRepeat(FlattenException $exception)
     {
-        $key = md5($exception->getMessage().':'.$exception->getLine().':'.$exception->getFile());
-        $file = $this->errorsDir.'/'.$key;
+        $key  = md5($exception->getMessage() . ':' . $exception->getLine() . ':' . $exception->getFile());
+        $file = $this->errorsDir . '/' . $key;
         $time = is_file($file) ? file_get_contents($file) : 0;
         if ($time < time()) {
             file_put_contents($file, time() + $this->repeatTimeout);
