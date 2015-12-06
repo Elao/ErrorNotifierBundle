@@ -5,15 +5,15 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="elao.error_notifier.decision_manager.class">Elao\ErrorNotifierBundle\DecisionManagement\Manager\NotificationDecisionmanager</parameter>
+        <parameter key="elao.error_notifier.decision_manager.class">Elao\ErrorNotifierBundle\DecisionManagement\Manager\NotificationDecisionManager</parameter>
 
-        <parameter key="elao.error_notifier.decider.client_ip.class">Elao\ErrorNotifierBundle\DecisionManagement\Voter\ClientIPVoter</parameter>
-        <parameter key="elao.error_notifier.decider.exception_class.class">Elao\ErrorNotifierBundle\DecisionManagement\Voter\ExceptionClassVoter</parameter>
-        <parameter key="elao.error_notifier.decider.http_code.class">Elao\ErrorNotifierBundle\DecisionManagement\Voter\HTTPCodeVoter</parameter>
-        <parameter key="elao.error_notifier.decider.php_error.class">Elao\ErrorNotifierBundle\DecisionManagement\Voter\PHPErrorVoter</parameter>
-        <parameter key="elao.error_notifier.decider.timeout.class">Elao\ErrorNotifierBundle\DecisionManagement\Voter\TimeoutVoter</parameter>
-        <parameter key="elao.error_notifier.decider.uri.class">Elao\ErrorNotifierBundle\DecisionManagement\Voter\URIVoter</parameter>
-        <parameter key="elao.error_notifier.decider.user_agent.class">Elao\ErrorNotifierBundle\DecisionManagement\UserAgentVoter\Voter</parameter>
+        <parameter key="elao.error_notifier.decider.client_ip.class">Elao\ErrorNotifierBundle\DecisionManagement\Decider\ClientIPDecider</parameter>
+        <parameter key="elao.error_notifier.decider.exception_class.class">Elao\ErrorNotifierBundle\DecisionManagement\Decider\ExceptionClassDecider</parameter>
+        <parameter key="elao.error_notifier.decider.http_code.class">Elao\ErrorNotifierBundle\DecisionManagement\Decider\HTTPCodeDecider</parameter>
+        <parameter key="elao.error_notifier.decider.php_error.class">Elao\ErrorNotifierBundle\DecisionManagement\Decider\PHPErrorDecider</parameter>
+        <parameter key="elao.error_notifier.decider.timeout.class">Elao\ErrorNotifierBundle\DecisionManagement\Decider\TimeoutDecider</parameter>
+        <parameter key="elao.error_notifier.decider.uri.class">Elao\ErrorNotifierBundle\DecisionManagement\Decider\URIDecider</parameter>
+        <parameter key="elao.error_notifier.decider.user_agent.class">Elao\ErrorNotifierBundle\DecisionManagement\Decider\UserAgentDecider</parameter>
     </parameters>
 
     <services>

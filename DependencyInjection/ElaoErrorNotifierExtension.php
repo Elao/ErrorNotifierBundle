@@ -85,10 +85,7 @@ class ElaoErrorNotifierExtension extends Extension
 
         $container
             ->getDefinition('elao.error_notifier.decider.client_ip')
-            ->replaceArgument(1, new Definition(
-                new Parameter('elao.error_notifier.matcher.class'),
-                array(null, null, null, $config['ignoredIPs'])
-            ))
+            ->replaceArgument(1, $config['ignoredIPs'])
         ;
 
         $container
@@ -217,7 +214,7 @@ class ElaoErrorNotifierExtension extends Extension
      */
     private function addSlackConfiguration(XmlFileLoader $loader, array $config, ContainerBuilder $container)
     {
-        $loader->load('slack.yml');
+        $loader->load('slack.xml');
 
         foreach (array('api_token', 'channel') as $field) {
             if (!$config[$field]) {
@@ -230,7 +227,7 @@ class ElaoErrorNotifierExtension extends Extension
 
         $container
             ->getDefinition('elao.error_notifier.notifier.default_slack')
-            ->replaceArgument(2, $config['channel'])
+            ->replaceArgument(3, $config['channel'])
         ;
 
         if (!class_exists('CL\Slack\Transport\ApiClient')) {
@@ -242,7 +239,7 @@ class ElaoErrorNotifierExtension extends Extension
         $container
             ->getDefinition('elao.error_notifier.client.slack')
             ->setClass('CL\Slack\Transport\ApiClient')
-            ->replaceArgument(0, $config['token'])
+            ->replaceArgument(0, $config['api_token'])
         ;
     }
 }
