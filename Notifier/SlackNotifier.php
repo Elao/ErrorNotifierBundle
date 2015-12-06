@@ -66,8 +66,6 @@ class SlackNotifier implements NotifierInterface
         Command $command = null,
         InputInterface $commandInput = null
     ) {
-        $this->assertClSlackInstalled();
-
         $text = $this->templating->render('ElaoErrorNotifierBundle:Slack:text.txt.twig', array(
             'exception'       => $exception,
             'request'         => $request,
@@ -84,21 +82,6 @@ class SlackNotifier implements NotifierInterface
         $payload->setIconEmoji('skull');
 
         $this->apiClient->send($payload);
-    }
-
-    /**
-     * Asserts CL Slack Bundle is installed and enabled to use this notifier
-     *
-     * @return null
-     * @throws \Exception
-     */
-    private function assertClSlackInstalled()
-    {
-        if (null === $this->apiClient) {
-            throw new \Exception(
-                'Please make sure that you have installed and enabled the CLSlackBundle (cleentfaar/slack-bundle)'
-            );
-        }
     }
 
     /**
