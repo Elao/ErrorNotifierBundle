@@ -96,8 +96,12 @@ class ElaoErrorNotifierExtension extends Extension
             ->replaceArgument(0, $config['ignoredClasses'])
         ;
 
-        if ($config['handle404'] && !in_array('404', $config['handleHTTPCodes'])) {
-            $config['handleHTTPCodes'][] = '404';
+        if ($config['handle404'] && !in_array(404, $config['handleHTTPCodes'])) {
+            $config['handleHTTPCodes'][] = 404;
+        }
+
+        if (!in_array(500, $config['handleHTTPCodes'])) {
+            $config['handleHTTPCodes'][] = 500;
         }
 
         $container
