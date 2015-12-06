@@ -24,30 +24,30 @@ class SlackNotifier implements NotifierInterface
     protected $templating;
 
     /**
-     * @var string
-     */
-    protected $channel;
-
-    /**
      * @var ApiClient
      */
     protected $apiClient;
 
     /**
+     * @var string
+     */
+    protected $channel;
+
+    /**
      * @param TokenStorageInterface $tokenStorage
      * @param EngineInterface $templating
-     * @param $channel
      * @param ApiClient $apiClient
+     * @param $channel
      */
     public function __construct(
         TokenStorageInterface $tokenStorage,
         EngineInterface $templating,
-        $channel,
-        ApiClient $apiClient = null
+        ApiClient $apiClient,
+        $channel
     ) {
         $this->tokenStorage     = $tokenStorage;
-        $this->apiClient        = $apiClient;
         $this->templating       = $templating;
+        $this->apiClient        = $apiClient;
 
         if (strpos($channel, '#') !== 0) {
             $channel = sprintf('#%s', $channel);

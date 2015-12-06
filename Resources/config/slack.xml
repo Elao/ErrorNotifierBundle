@@ -16,8 +16,8 @@
         <service id="elao.error_notifier.notifier.default_slack" class="%elao.error_notifier.notifier.default_slack.class%">
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="templating" />
+            <argument type="service" id="elao.error_notifier.client.slack" />
             <argument />    <!-- channel -->
-            <argument type="service" id="elao.error_notifier.client.slack" on-invalid="null" />
             <tag name="elao.error_notifier.notifier" alias="default_slack" />
         </service>
     </services>

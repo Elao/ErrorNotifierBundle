@@ -10,7 +10,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-
     /**
      * Get config tree
      *
@@ -32,24 +31,41 @@ class Configuration implements ConfigurationInterface
                             return array($value);
                         })
                     ->end()
-                    ->treatNullLike(false)
-                    ->prototype('scalar')->end()
+                    ->treatNullLike(array())
+                    ->isRequired()
+                    ->cannotBeEmpty()
+                    ->prototype('scalar')
+                    ->end()
                 ->end()
                 ->scalarNode('from')
-                    ->treatNullLike(false)
-                ->end()
-                ->booleanNode('handle404')
-                    ->defaultValue(false)
-                ->end()
-                ->arrayNode('ignored404Paths')
-                    ->prototype('scalar')->end()
-                    ->treatNullLike(array())
+                    ->isRequired()
+                    ->cannotBeEmpty()
                 ->end()
                 ->scalarNode('mailer')
                     ->defaultValue('mailer')
                 ->end()
+
                 ->scalarNode('repeatTimeout')
                     ->defaultValue(false)
+                ->end()
+                ->booleanNode('handle404')
+                    ->defaultValue(false)
+                ->end()
+                ->arrayNode('handleHTTPCodes')
+                    ->beforeNormalization()
+                    ->ifArray()
+                        ->then(function ($array) {
+                            foreach ($array as $key => $value) {
+                                $array[$key] = (int) $value;
+                            }
+
+                            return $array;
+                        })
+                    ->end()
+                    ->defaultValue(array())
+                    ->treatNullLike(array())
+                    ->prototype('integer')
+                    ->end()
                 ->end()
                 ->booleanNode('handlePHPWarnings')
                     ->defaultValue(false)
@@ -60,12 +76,55 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('handleSilentErrors')
                     ->defaultValue(false)
                 ->end()
+
                 ->arrayNode('ignoredClasses')
-                    ->prototype('scalar')->end()
+                    ->defaultValue(array())
                     ->treatNullLike(array())
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+                ->arrayNode('ignoredPhpErrors')
+                    ->beforeNormalization()
+                    ->ifArray()
+                        ->then(function ($array) {
+                            foreach ($array as $key => $value) {
+                                $array[$key] = (int) (defined($value) ? constant($value) : $value);
+                            }
+
+                            return $array;
+                        })
+                    ->end()
+                    ->defaultValue(array())
+                    ->treatNullLike(array())
+                    ->prototype('integer')
+                    ->end()
+                ->end()
+                ->arrayNode('ignored404Paths')
+                    ->defaultValue(array())
+                    ->treatNullLike(array())
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+                ->arrayNode('ignoredIPs')
+                    ->defaultValue(array())
+                    ->treatNullLike(array())
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+                ->arrayNode('ignoredAgentPatterns')
+                    ->defaultValue(array())
+                    ->treatNullLike(array())
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+                ->arrayNode('ignoredUrlPatterns')
+                    ->defaultValue(array())
+                    ->treatNullLike(array())
+                    ->prototype('scalar')
+                    ->end()
                 ->end()
 
-                ->arrayNode('enabled_notifiers')
+                ->arrayNode('enabledNotifiers')
                     ->prototype('scalar')->end()
                     ->treatNullLike(array('default_mailer'))
                     ->performNoDeepMerging()
