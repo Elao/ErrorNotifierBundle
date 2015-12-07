@@ -12,7 +12,7 @@ class ExceptionClassDeciderTest extends \PHPUnit_Framework_TestCase
      * @test
      * @covers \Elao\ErrorNotifierBundle\DecisionManagement\Decider\ExceptionClassDecider::__construct
      */
-    public function it_requires_an_array_or_strings()
+    public function it_requires_an_array_of_strings()
     {
         $this->setExpectedException(AssertException::CLASS_NAME);
 

@@ -85,10 +85,7 @@ class ElaoErrorNotifierExtensionTest extends AbstractExtensionTestCase
         $this->assertContainerBuilderHasServiceDefinitionWithArgument(
             'elao.error_notifier.decider.client_ip',
             1,
-            new Definition(
-                new Parameter('elao.error_notifier.matcher.class'),
-                array(null, null, null, array('33.33.33.1', '33.33.33.2'))
-            )
+            array('33.33.33.1', '33.33.33.2')
         );
 
         $this->assertContainerBuilderHasServiceDefinitionWithTag(

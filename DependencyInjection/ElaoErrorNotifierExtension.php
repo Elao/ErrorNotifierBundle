@@ -89,6 +89,11 @@ class ElaoErrorNotifierExtension extends Extension
         ;
 
         $container
+            ->getDefinition('elao.error_notifier.decider.command')
+            ->replaceArgument(0, $config['ignoredCommands'])
+        ;
+
+        $container
             ->getDefinition('elao.error_notifier.decider.exception_class')
             ->replaceArgument(0, $config['ignoredClasses'])
         ;

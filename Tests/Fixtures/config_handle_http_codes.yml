@@ -1,5 +1,3 @@
 elao_error_notifier:
-    to: test@example.com
-    from: test@example.com
     handleHTTPCodes:
         - 400

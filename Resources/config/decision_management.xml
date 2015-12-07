@@ -8,6 +8,7 @@
         <parameter key="elao.error_notifier.decision_manager.class">Elao\ErrorNotifierBundle\DecisionManagement\Manager\NotificationDecisionManager</parameter>
 
         <parameter key="elao.error_notifier.decider.client_ip.class">Elao\ErrorNotifierBundle\DecisionManagement\Decider\ClientIPDecider</parameter>
+        <parameter key="elao.error_notifier.decider.command.class">Elao\ErrorNotifierBundle\DecisionManagement\Decider\CommandDecider</parameter>
         <parameter key="elao.error_notifier.decider.exception_class.class">Elao\ErrorNotifierBundle\DecisionManagement\Decider\ExceptionClassDecider</parameter>
         <parameter key="elao.error_notifier.decider.http_code.class">Elao\ErrorNotifierBundle\DecisionManagement\Decider\HTTPCodeDecider</parameter>
         <parameter key="elao.error_notifier.decider.php_error.class">Elao\ErrorNotifierBundle\DecisionManagement\Decider\PHPErrorDecider</parameter>
@@ -24,6 +25,12 @@
             <argument type="service" id="request_stack" />
             <argument />    <!-- ignored IPs -->
             <tag name="elao.error_notifier.decider" />
+        </service>
+
+        <service id="elao.error_notifier.decider.command" class="%elao.error_notifier.decider.command.class%">
+            <argument />    <!-- ignored commands -->
+            <tag name="elao.error_notifier.decider" />
+            <tag name="kernel.event_subscriber" />
         </service>
 
         <service id="elao.error_notifier.decider.exception_class" class="%elao.error_notifier.decider.exception_class.class%">

@@ -28,17 +28,12 @@ class ConfigurationTest extends AbstractExtensionConfigurationTestCase
      * @test
      * @covers \Elao\ErrorNotifierBundle\DependencyInjection\Configuration::getConfigTreeBuilder
      */
-    public function it_converts_string_to_array_for_to_parameter()
+    public function it_loads_the_default_configuration()
     {
         $this->assertProcessedConfigurationEquals(
             array_merge(
                 $this->getDefaultConfiguration(),
-                array(
-                    'to'    => array(
-                        'test@example.com',
-                    ),
-                    'from'  => 'test@example.com'
-                )
+                array()
             ),
             array(
                 __DIR__ . '/../Fixtures/config_default.yml'
@@ -56,10 +51,6 @@ class ConfigurationTest extends AbstractExtensionConfigurationTestCase
             array_merge(
                 $this->getDefaultConfiguration(),
                 array(
-                    'to'                => array(
-                        'test@example.com',
-                    ),
-                    'from'              => 'test@example.com',
                     'handleHTTPCodes'   => array(
                         400,
                     )
@@ -81,10 +72,6 @@ class ConfigurationTest extends AbstractExtensionConfigurationTestCase
             array_merge(
                 $this->getDefaultConfiguration(),
                 array(
-                    'to'                => array(
-                        'test@example.com',
-                    ),
-                    'from'              => 'test@example.com',
                     'ignoredPhpErrors'  => array(
                         E_NOTICE,
                         E_USER_NOTICE,
@@ -104,7 +91,7 @@ class ConfigurationTest extends AbstractExtensionConfigurationTestCase
     {
         return array(
             'to'                    => array(),
-            'from'                  => null,
+            'from'                  => false,
             'mailer'                => 'mailer',
             'repeatTimeout'         => false,
             'handle404'             => false,
@@ -112,6 +99,7 @@ class ConfigurationTest extends AbstractExtensionConfigurationTestCase
             'handlePHPWarnings'     => false,
             'handlePHPErrors'       => false,
             'handleSilentErrors'    => false,
+            'ignoredCommands'       => array(),
             'ignoredClasses'        => array(),
             'ignoredPhpErrors'      => array(),
             'ignored404Paths'       => array(),
