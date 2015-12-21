@@ -1,33 +1,40 @@
 <?php
 
+/*
+ * This file is part of the Elao ErrorNotifier Bundle
+ *
+ * Copyright (C) Elao
+ *
+ * @author Elao <contact@elao.com>
+ */
+
 namespace Elao\ErrorNotifierBundle\Listener;
 
-use \Swift_Mailer;
+use Swift_Mailer;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Templating\EngineInterface;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleExceptionEvent;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Templating\EngineInterface;
 
 /**
  * Notifier
  */
 class Notifier
 {
-
     /**
-     * @var Swift_Mailer $mailer
+     * @var Swift_Mailer
      */
     private $mailer;
 
     /**
-     * @var EngineInterface $templating
+     * @var EngineInterface
      */
     private $templating;
 
@@ -105,13 +112,13 @@ class Notifier
             }
 
             if (strlen($this->ignoredAgentsPattern)) {
-                if (preg_match('#'.$this->ignoredAgentsPattern.'#', $event->getRequest()->headers->get('User-Agent'))) {
+                if (preg_match('#' . $this->ignoredAgentsPattern . '#', $event->getRequest()->headers->get('User-Agent'))) {
                     return;
                 }
             }
 
             if (strlen($this->ignoredUrlsPattern)) {
-                if (preg_match('#'.$this->ignoredUrlsPattern.'#', $event->getRequest()->getUri())) {
+                if (preg_match('#' . $this->ignoredUrlsPattern . '#', $event->getRequest()->getUri())) {
                     return;
                 }
             }
@@ -172,7 +179,7 @@ class Notifier
     {
         $this->request = null;
 
-        $this->command = $event->getCommand();
+        $this->command      = $event->getCommand();
         $this->commandInput = $event->getInput();
 
         if ($this->reportErrors || $this->reportWarnings) {
@@ -198,10 +205,10 @@ class Notifier
     /**
      * @see http://php.net/set_error_handler
      *
-     * @param integer $level
-     * @param string  $message
-     * @param string  $file
-     * @param integer $line
+     * @param int    $level
+     * @param string $message
+     * @param string $file
+     * @param int    $line
      *
      * @throws ErrorException
      */
@@ -220,7 +227,7 @@ class Notifier
             return false;
         }
 
-        if(in_array($message, $this->ignoredPhpErrors)) {
+        if (in_array($message, $this->ignoredPhpErrors)) {
             return false;
         }
 
@@ -257,7 +264,7 @@ class Notifier
         }
 
         if (in_array($lastError['type'], $errors) && !in_array(@$lastError['message'], $this->ignoredPhpErrors)) {
-            $exception = new \ErrorException(sprintf('%s: %s in %s line %d', @$this->getErrorString(@$lastError['type']), @$lastError['message'], @$lastError['file'], @$lastError['line']),  @$lastError['type'], @$lastError['type'], @$lastError['file'], @$lastError['line']);
+            $exception = new \ErrorException(sprintf('%s: %s in %s line %d', @$this->getErrorString(@$lastError['type']), @$lastError['message'], @$lastError['file'], @$lastError['line']), @$lastError['type'], @$lastError['type'], @$lastError['file'], @$lastError['line']);
             $this->createMailAndSend($exception, $this->request, null, $this->command, $this->commandInput);
         }
     }
@@ -265,7 +272,8 @@ class Notifier
     /**
      * Convert the error code to a readable format
      *
-     * @param  integer $errorNo
+     * @param int $errorNo
+     *
      * @return string
      */
     public function getErrorString($errorNo)
@@ -314,12 +322,12 @@ class Notifier
             'status_code'     => $exception->getCode(),
             'context'         => $context,
             'command'         => $command,
-            'command_input'   => $commandInput
+            'command_input'   => $commandInput,
         ));
 
-        if($this->request) {
+        if ($this->request) {
             $subject = '[' . $request->headers->get('host') . '] Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
-        } elseif($this->command) {
+        } elseif ($this->command) {
             $subject = '[' . $this->command->getName() . '] Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
         } else {
             $subject = 'Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
@@ -344,13 +352,14 @@ class Notifier
     /**
      * Check last send time
      *
-     * @param  FlattenException $exception
+     * @param FlattenException $exception
+     *
      * @return bool
      */
     private function checkRepeat(FlattenException $exception)
     {
-        $key = md5($exception->getMessage().':'.$exception->getLine().':'.$exception->getFile());
-        $file = $this->errorsDir.'/'.$key;
+        $key  = md5($exception->getMessage() . ':' . $exception->getLine() . ':' . $exception->getFile());
+        $file = $this->errorsDir . '/' . $key;
         $time = is_file($file) ? file_get_contents($file) : 0;
         if ($time < time()) {
             file_put_contents($file, time() + $this->repeatTimeout);
@@ -373,5 +382,4 @@ class Notifier
     {
         self::$tmpBuffer = '';
     }
-
 }

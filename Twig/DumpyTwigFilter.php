@@ -1,5 +1,17 @@
 <?php
 
+/*
+ * This file is part of the Elao ErrorNotifier Bundle
+ *
+ * Copyright (C) Elao
+ *
+ * @author Elao <contact@elao.com>
+ */
+namespace Elao\ErrorNotifierBundle\Twig;
+
+use Elao\ErrorNotifierBundle\Exception\InvokerException;
+use Symfony\Component\Yaml\Dumper as YamlDumper;
+
 /**
  * Extends Twig with
  *   {{ "my string, whatever" | pre }}  --> wraps with <pre>
@@ -21,14 +33,9 @@
  *   Default value is 1. (MAX_DEPTH const)
  *
  * @see https://gist.github.com/1747036
+ *
  * @author Goutte
  */
-
-namespace Elao\ErrorNotifierBundle\Twig;
-
-use Symfony\Component\Yaml\Dumper as YamlDumper;
-use Elao\ErrorNotifierBundle\Exception\InvokerException;
-
 class DumpyTwigFilter extends \Twig_Extension
 {
     /** @const INLINE : default value for the inline parameter of the YAML dumper aka the expanding-level */
@@ -52,7 +59,7 @@ class DumpyTwigFilter extends \Twig_Extension
 
     public function pre($stringable)
     {
-        return "<pre>" . (string) $stringable . "</pre>";
+        return '<pre>' . (string) $stringable . '</pre>';
     }
 
     public function preDump($values)
@@ -69,7 +76,8 @@ class DumpyTwigFilter extends \Twig_Extension
      * Encodes as YAML the passed $input
      *
      * @param $input
-     * @param  int   $inline
+     * @param int $inline
+     *
      * @return mixed
      */
     public function encode($input, $inline = self::INLINE)
@@ -86,8 +94,9 @@ class DumpyTwigFilter extends \Twig_Extension
     /**
      * Returns a templating-helper dump of depth-sanitized var as yaml string
      *
-     * @param  mixed  $value What to dump
-     * @param  int    $depth Recursion max depth
+     * @param mixed $value What to dump
+     * @param int   $depth Recursion max depth
+     *
      * @return string
      */
     public function yamlDump($value, $depth = self::MAX_DEPTH)
@@ -101,18 +110,19 @@ class DumpyTwigFilter extends \Twig_Extension
      * A bit dirty as this should be in another Class, but hey
      *
      * @param $value
-     * @param  int          $maxRecursionDepth The maximum depth of recursion
-     * @param  int          $recursionDepth    The depth of recursion (used internally)
+     * @param int $maxRecursionDepth The maximum depth of recursion
+     * @param int $recursionDepth    The depth of recursion (used internally)
+     *
      * @return array|string
      */
-    public function sanitize ($value, $maxRecursionDepth = self::MAX_DEPTH, $recursionDepth = 0)
+    public function sanitize($value, $maxRecursionDepth = self::MAX_DEPTH, $recursionDepth = 0)
     {
         if (is_resource($value)) {
             return 'Resource';
         }
 
         if (is_array($value)) {
-            return $this->sanitizeIterateable ($value, $maxRecursionDepth, $recursionDepth);
+            return $this->sanitizeIterateable($value, $maxRecursionDepth, $recursionDepth);
         }
 
         if ($value instanceof InvokerException) {
@@ -143,12 +153,11 @@ class DumpyTwigFilter extends \Twig_Extension
                 }
 
                 return $classInfo;
-
             } else { // Get all accessors and their values
-                $data = array();
-                $data['class'] = '<span title="' . $class->getName(). '">' . $class->getShortName() . '</span>';
+                $data          = array();
+                $data['class'] = '<span title="' . $class->getName() . '">' . $class->getShortName() . '</span>';
                 if ($class->isIterateable()) {
-                    $data['iterateable'] = $this->sanitizeIterateable ($value, $maxRecursionDepth, $recursionDepth);
+                    $data['iterateable'] = $this->sanitizeIterateable($value, $maxRecursionDepth, $recursionDepth);
                 } else {
                     $data['accessors'] = array();
                     foreach ($class->getMethods() as $method) {
@@ -160,18 +169,16 @@ class DumpyTwigFilter extends \Twig_Extension
                             $methodInfo = ($method->getNumberOfParameters() ? substr($methodInfo, 0, -2) : $methodInfo) . ')';
                             if (!$method->getNumberOfRequiredParameters()) { // Get the value, we don't need params
                                 try {
-                                    $methodValue = $method->invoke($value);
+                                    $methodValue                    = $method->invoke($value);
                                     $data['accessors'][$methodInfo] = $this->sanitize($methodValue, $maxRecursionDepth, $recursionDepth + 1);
                                 } catch (\Exception $e) {
                                     $data['accessors'][$methodInfo] = $this->sanitize(new InvokerException('Couldn\'t invoke method: Exception "' . get_class($e) . '" with message "' . $e->getMessage() . '"'), $maxRecursionDepth, $recursionDepth + 1);
                                 }
-
                             } else { // Get only method name and its params
                                 $data['accessors'][] = $methodInfo;
                             }
                         }
                     }
-
                 }
 
                 return $data;
@@ -179,15 +186,15 @@ class DumpyTwigFilter extends \Twig_Extension
         }
 
         if (is_string($value)) {
-            $value = '(string) '.$value;
+            $value = '(string) ' . $value;
         }
 
         if (is_int($value)) {
-            $value = '(int) '.$value;
+            $value = '(int) ' . $value;
         }
 
         if (is_float($value)) {
-            $value = '(float) '.$value;
+            $value = '(float) ' . $value;
         }
 
         if (is_null($value)) {
@@ -205,25 +212,26 @@ class DumpyTwigFilter extends \Twig_Extension
         return $value;
     }
 
-    public function sanitizeIterateable ($value, $maxRecursionDepth = self::MAX_DEPTH, $recursionDepth = 0)
+    public function sanitizeIterateable($value, $maxRecursionDepth = self::MAX_DEPTH, $recursionDepth = 0)
     {
         if ($recursionDepth < $maxRecursionDepth) {
-            $r = array ();
+            $r          = array();
             $arrayCount = count($value);
-            $count = 0;
+            $count      = 0;
 
             foreach ($value as $k => $v) {
                 $r[$k] = $this->sanitize($v, $maxRecursionDepth, $recursionDepth + 1);
                 $count++;
-                if($count >= 20) {
+                if ($count >= 20) {
                     $r[] = sprintf('... and %s more ...', ($arrayCount - $count));
                     break;
                 }
             }
-            
+
             return $r;
         } else {
-            $c = count($value); $t = gettype($value);
+            $c = count($value);
+            $t = gettype($value);
 
             return $c ? "$t of $c" : "empty $t";
         }
