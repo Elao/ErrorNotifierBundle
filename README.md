@@ -1,8 +1,12 @@
 # Elao ErrorNotifier Bundle
 
-[![knpbundles.com](http://knpbundles.com/Elao/ErrorNotifierBundle/badge)](http://knpbundles.com/Elao/ErrorNotifierBundle)
+[![Latest Stable Version](https://poser.pugx.org/elao/error-notifier-bundle/v/stable)](https://packagist.org/packages/elao/error-notifier-bundle) 
+[![Total Downloads](https://poser.pugx.org/elao/error-notifier-bundle/downloads)](https://packagist.org/packages/elao/error-notifier-bundle) 
+[![Monthly Downloads](https://poser.pugx.org/elao/error-notifier-bundle/d/monthly)](https://packagist.org/packages/elao/error-notifier-bundle)
+[![Latest Unstable Version](https://poser.pugx.org/elao/error-notifier-bundle/v/unstable)](https://packagist.org/packages/elao/error-notifier-bundle) 
+[![License](https://poser.pugx.org/elao/error-notifier-bundle/license)](https://packagist.org/packages/elao/error-notifier-bundle)
 
-## What is it ?
+## What is it?
 
 This bundle sends an email each time there is a 500 error on the production server. You can also be notified of 404 or PHP fatal errors.
 
