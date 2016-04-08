@@ -1,16 +1,20 @@
 # Elao ErrorNotifier Bundle
 
-[![knpbundles.com](http://knpbundles.com/Elao/ErrorNotifierBundle/badge)](http://knpbundles.com/Elao/ErrorNotifierBundle)
+[![Latest Stable Version](https://poser.pugx.org/elao/error-notifier-bundle/v/stable)](https://packagist.org/packages/elao/error-notifier-bundle) 
+[![Total Downloads](https://poser.pugx.org/elao/error-notifier-bundle/downloads)](https://packagist.org/packages/elao/error-notifier-bundle) 
+[![Monthly Downloads](https://poser.pugx.org/elao/error-notifier-bundle/d/monthly)](https://packagist.org/packages/elao/error-notifier-bundle)
+[![Latest Unstable Version](https://poser.pugx.org/elao/error-notifier-bundle/v/unstable)](https://packagist.org/packages/elao/error-notifier-bundle) 
+[![License](https://poser.pugx.org/elao/error-notifier-bundle/license)](https://packagist.org/packages/elao/error-notifier-bundle)
 
-## What is it ?
+## What is it?
 
 This bundle sends an email each time there is a 500 error on the production server. You can also be notified of 404 or PHP fatal errors.
 
-The email contains a lot of information : see the screenshot at the end of the README.
+The email contains a lot of information: see the screenshot at the end of the README.
 
 ## Installation
 
-#### If you are working with Symfony >= 2.1
+### Symfony >= 2.1
 
 Add this in your `composer.json`
 
@@ -20,7 +24,7 @@ Add this in your `composer.json`
 
 And run `php composer.phar update elao/error-notifier-bundle`
 
-#### If you are (still) working with Symfony 2.0.x
+### Symfony 2.0.x
 
 Add the followings lines to your `deps` file
 
@@ -30,10 +34,12 @@ Add the followings lines to your `deps` file
 
 and don't forget to register it in your autoloading `app/autoload.php`
 
-    $loader->registerNamespaces(array(
-        ...
-        'Elao' => __DIR__.'/../vendor/bundles',
-    ));
+```php
+$loader->registerNamespaces(array(
+    ...
+    'Elao' => __DIR__.'/../vendor/bundles',
+));
+```
 
 and finally run the vendors script:
 
@@ -41,16 +47,17 @@ and finally run the vendors script:
 $ php bin/vendors install
 ```
 
-### Register the bundle `app/AppKernel.php`
+### Register the bundle in `app/AppKernel.php`
 
-    public function registerBundles()
-    {
-        return array(
-            // ...
-            new Elao\ErrorNotifierBundle\ElaoErrorNotifierBundle(),
-        );
-    }
-
+```php
+public function registerBundles()
+{
+    return array(
+        // ...
+        new Elao\ErrorNotifierBundle\ElaoErrorNotifierBundle(),
+    );
+}
+```
 
 ## Configuration
 
@@ -71,8 +78,11 @@ elao_error_notifier:
 ```
 
 ### How to setup another mailer for sending the error mail
+
 The mailer option has been added to let the application send the error mail via local smtp instead of using the regular quota on 3rd mailer services.
+
 For example, if you wish to use an custom mailer that send mails via your server mail transport, create this one in the `config.yml` of your project:
+
 ```yml
 # app/config/config.yml
 swiftmailer:
@@ -134,29 +144,31 @@ In this example, if an errors X occurs, and the same error X occurs again within
 
 ## Twig Extension
 
-There are also some extensions that you can use in your Twig templates (thanks to [Goutte](https://github.com/Goutte))
+There are also some extensions that you can use in your Twig templates (thanks to [Goutte](https://github.com/Goutte)).
 
-Extends Twig with
+Extends Twig with:
 
-    {{ "my string, whatever" | pre }}  --> wraps with <pre>
-    {{ myBigVar | yaml_dump | pre }} as {{ myBigVar | ydump }} or {{ myBigVar | dumpy }}
-    {{ myBigVar | var_dump | pre }}  as {{ myBigVar | dump }}
+```twig
+{{ "my string, whatever" | pre }}  --> wraps with <pre>
+{{ myBigVar | yaml_dump | pre }} as {{ myBigVar | ydump }} or {{ myBigVar | dumpy }}
+{{ myBigVar | var_dump | pre }}  as {{ myBigVar | dump }}
 
 You may control the depth of recursion with a parameter, say foo = array('a'=>array('b'=>array('c','d')))
 
-    {{ foo | dumpy(0) }} --> 'array of 1'
-    {{ foo | dumpy(2) }} -->
-                               a:
-                                 b: 'array of 2'
-    {{ foo | dumpy(3) }} -->
-                               a:
-                                 b:
-                                   - c
-                                   - d
+{{ foo | dumpy(0) }} --> 'array of 1'
+{{ foo | dumpy(2) }} -->
+                           a:
+                             b: 'array of 2'
+{{ foo | dumpy(3) }} -->
+                           a:
+                             b:
+                               - c
+                               - d
+```
 
-Default value is 1. (MAX_DEPTH const)
+Default value is 1 (MAX_DEPTH const).
 
-### How to ignore sending HTTP errors if request comes from any of given IPs ?
+### How to ignore sending HTTP errors if request comes from any of given IPs?
 
 If you want to ignore sending HTTP errors if the request comes from specific IPs, you can now specify the list of ignored IPs.
 
@@ -166,6 +178,7 @@ elao_error_notifier:
     ignoredIPs:
         - "178.63.45.100"
         - ...
+```
 
 ### How to ignore sending HTTP errors if the user agent match a given pattern?
 
@@ -177,7 +190,6 @@ to generate URLs which may not exist in your site.
 # app/config/config_prod.yml
 elao_error_notifier:
     ignoredAgentsPattern: "(Googlebot|bingbot)"
-
 ```
 
 ### How to ignore sending HTTP errors if the URI match a given pattern?
@@ -188,7 +200,6 @@ For example if you want to ignore all not exist images errors you may do somethi
 # app/config/config_prod.yml
 elao_error_notifier:
     ignoredUrlsPattern: "\.(jpg|png|gif)"
-
 ```
 
 ## Screenshot
