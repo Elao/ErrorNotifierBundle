@@ -10,11 +10,11 @@
 
 This bundle sends an email each time there is a 500 error on the production server. You can also be notified of 404 or PHP fatal errors.
 
-The email contains a lot of information : see the screenshot at the end of the README.
+The email contains a lot of information: see the screenshot at the end of the README.
 
 ## Installation
 
-#### If you are working with Symfony >= 2.1
+### Symfony >= 2.1
 
 Add this in your `composer.json`
 
@@ -24,7 +24,7 @@ Add this in your `composer.json`
 
 And run `php composer.phar update elao/error-notifier-bundle`
 
-#### If you are (still) working with Symfony 2.0.x
+### Symfony 2.0.x
 
 Add the followings lines to your `deps` file
 
@@ -47,7 +47,7 @@ and finally run the vendors script:
 $ php bin/vendors install
 ```
 
-### Register the bundle `app/AppKernel.php`
+### Register the bundle in `app/AppKernel.php`
 
 ```php
 public function registerBundles()
@@ -78,8 +78,11 @@ elao_error_notifier:
 ```
 
 ### How to setup another mailer for sending the error mail
+
 The mailer option has been added to let the application send the error mail via local smtp instead of using the regular quota on 3rd mailer services.
+
 For example, if you wish to use an custom mailer that send mails via your server mail transport, create this one in the `config.yml` of your project:
+
 ```yml
 # app/config/config.yml
 swiftmailer:
@@ -141,9 +144,9 @@ In this example, if an errors X occurs, and the same error X occurs again within
 
 ## Twig Extension
 
-There are also some extensions that you can use in your Twig templates (thanks to [Goutte](https://github.com/Goutte))
+There are also some extensions that you can use in your Twig templates (thanks to [Goutte](https://github.com/Goutte)).
 
-Extends Twig with
+Extends Twig with:
 
 ```twig
 {{ "my string, whatever" | pre }}  --> wraps with <pre>
@@ -163,9 +166,9 @@ You may control the depth of recursion with a parameter, say foo = array('a'=>ar
                                - d
 ```
 
-Default value is 1. (MAX_DEPTH const)
+Default value is 1 (MAX_DEPTH const).
 
-### How to ignore sending HTTP errors if request comes from any of given IPs ?
+### How to ignore sending HTTP errors if request comes from any of given IPs?
 
 If you want to ignore sending HTTP errors if the request comes from specific IPs, you can now specify the list of ignored IPs.
 
