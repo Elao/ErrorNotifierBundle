@@ -34,10 +34,12 @@ Add the followings lines to your `deps` file
 
 and don't forget to register it in your autoloading `app/autoload.php`
 
-    $loader->registerNamespaces(array(
-        ...
-        'Elao' => __DIR__.'/../vendor/bundles',
-    ));
+```php
+$loader->registerNamespaces(array(
+    ...
+    'Elao' => __DIR__.'/../vendor/bundles',
+));
+```
 
 and finally run the vendors script:
 
@@ -47,14 +49,15 @@ $ php bin/vendors install
 
 ### Register the bundle `app/AppKernel.php`
 
-    public function registerBundles()
-    {
-        return array(
-            // ...
-            new Elao\ErrorNotifierBundle\ElaoErrorNotifierBundle(),
-        );
-    }
-
+```php
+public function registerBundles()
+{
+    return array(
+        // ...
+        new Elao\ErrorNotifierBundle\ElaoErrorNotifierBundle(),
+    );
+}
+```
 
 ## Configuration
 
@@ -142,21 +145,23 @@ There are also some extensions that you can use in your Twig templates (thanks t
 
 Extends Twig with
 
-    {{ "my string, whatever" | pre }}  --> wraps with <pre>
-    {{ myBigVar | yaml_dump | pre }} as {{ myBigVar | ydump }} or {{ myBigVar | dumpy }}
-    {{ myBigVar | var_dump | pre }}  as {{ myBigVar | dump }}
+```twig
+{{ "my string, whatever" | pre }}  --> wraps with <pre>
+{{ myBigVar | yaml_dump | pre }} as {{ myBigVar | ydump }} or {{ myBigVar | dumpy }}
+{{ myBigVar | var_dump | pre }}  as {{ myBigVar | dump }}
 
 You may control the depth of recursion with a parameter, say foo = array('a'=>array('b'=>array('c','d')))
 
-    {{ foo | dumpy(0) }} --> 'array of 1'
-    {{ foo | dumpy(2) }} -->
-                               a:
-                                 b: 'array of 2'
-    {{ foo | dumpy(3) }} -->
-                               a:
-                                 b:
-                                   - c
-                                   - d
+{{ foo | dumpy(0) }} --> 'array of 1'
+{{ foo | dumpy(2) }} -->
+                           a:
+                             b: 'array of 2'
+{{ foo | dumpy(3) }} -->
+                           a:
+                             b:
+                               - c
+                               - d
+```
 
 Default value is 1. (MAX_DEPTH const)
 
@@ -170,6 +175,7 @@ elao_error_notifier:
     ignoredIPs:
         - "178.63.45.100"
         - ...
+```
 
 ### How to ignore sending HTTP errors if the user agent match a given pattern?
 
@@ -181,7 +187,6 @@ to generate URLs which may not exist in your site.
 # app/config/config_prod.yml
 elao_error_notifier:
     ignoredAgentsPattern: "(Googlebot|bingbot)"
-
 ```
 
 ### How to ignore sending HTTP errors if the URI match a given pattern?
@@ -192,7 +197,6 @@ For example if you want to ignore all not exist images errors you may do somethi
 # app/config/config_prod.yml
 elao_error_notifier:
     ignoredUrlsPattern: "\.(jpg|png|gif)"
-
 ```
 
 ## Screenshot
