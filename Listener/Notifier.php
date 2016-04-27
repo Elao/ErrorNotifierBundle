@@ -47,6 +47,7 @@ class Notifier
     private $to;
     private $request;
     private $handle404;
+    private $handleHTTPcodes;
     private $ignoredClasses;
     private $ignoredPhpErrors;
     private $reportWarnings = false;
