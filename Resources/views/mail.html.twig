@@ -343,7 +343,7 @@
                                 {% for position, e in exception.toarray %}
                                     {# see TwigBundle:Exception:traces.html.twig #}
                                     <ol class="traces list_exception" id="traces">
-                                        {% for i, trace in exception.trace %}
+                                        {% for i, trace in e.trace %}
                                             {# see TwigBundle:Exception:trace.html.twig #}
                                             <li>
                                             {% if trace.class is defined %}
