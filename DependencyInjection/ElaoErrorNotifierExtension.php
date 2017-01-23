@@ -39,9 +39,16 @@ class ElaoErrorNotifierExtension extends Extension
             $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__ . '/../Resources/config/')));
             $loader->load('services.xml');
 
+            $definition = false;
+
             if ($config['mailer'] != 'mailer') {
                 $definition = $container->getDefinition('elao.error_notifier.listener');
                 $definition->replaceArgument(0, new Reference($config['mailer']));
+            }
+
+            if ($config['lazyLoad']) {
+                $definition = $definition ?: $container->getDefinition('elao.error_notifier.listener');
+                $definition->setLazy($config['lazyLoad']);
             }
         }
     }
