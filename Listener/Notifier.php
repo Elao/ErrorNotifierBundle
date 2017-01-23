@@ -302,7 +302,7 @@ class Notifier
     }
 
     /**
-     * @param ErrorException $exception
+     * @param \Throwable     $exception
      * @param Request        $request
      * @param array          $context
      * @param Command        $command
@@ -311,8 +311,19 @@ class Notifier
     public function createMailAndSend($exception, Request $request = null, $context = null, Command $command = null, InputInterface $commandInput = null)
     {
         if (!$exception instanceof FlattenException) {
+            if ($exception instanceof \Error) {
+                $exception = new \ErrorException(
+                    $exception->getMessage(),
+                    $exception->getCode(),
+                    E_ERROR,
+                    $exception->getFile(),
+                    $exception->getLine()
+                );
+            }
+
             $exception = FlattenException::create($exception);
         }
+
         if ($this->repeatTimeout && $this->checkRepeat($exception)) {
             return;
         }
