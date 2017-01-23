@@ -51,9 +51,9 @@ class DumpyTwigFilter extends \Twig_Extension
         $optionsForRaw = array('is_safe' => array('all')); // allows raw dumping (otherwise <pre> is encoded)
 
         return array(
-            'pre'   => new \Twig_Filter_Method($this, 'pre', $optionsForRaw),
-            'dump'  => new \Twig_Filter_Method($this, 'preDump', $optionsForRaw),
-            'dumpy' => new \Twig_Filter_Method($this, 'preYamlDump', $optionsForRaw),
+            'pre'   => new \Twig_SimpleFilter('pre', array($this, 'pre'), $optionsForRaw),
+            'dump'  => new \Twig_SimpleFilter('dump', array($this, 'preDump'), $optionsForRaw),
+            'dumpy' => new \Twig_SimpleFilter('dumpy', array($this, 'preYamlDump'), $optionsForRaw),
         );
     }
 
