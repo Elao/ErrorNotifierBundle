@@ -43,9 +43,17 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')
                     ->end()
                 ->end()
-                ->scalarNode('from')
+                ->arrayNode('from')
+                    ->beforeNormalization()
+                    ->ifString()
+                        ->then(function ($value) {
+                            return array($value);
+                        })
+                    ->end()
                     ->isRequired()
                     ->cannotBeEmpty()
+                    ->prototype('scalar')
+                    ->end()
                 ->end()
                 ->booleanNode('handle404')
                     ->defaultValue(false)
