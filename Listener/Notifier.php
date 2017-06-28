@@ -351,7 +351,7 @@ class Notifier
             $subject = substr($subject, 0, 255);
         }
 
-        $mail = \Swift_Message::newInstance()
+        $mail = (new \Swift_Message())
             ->setSubject($subject)
             ->setFrom($this->from)
             ->setTo($this->to)
