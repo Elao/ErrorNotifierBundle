@@ -57,6 +57,7 @@ class Notifier
     private $ignoredIPs;
     private $ignoredAgentsPattern;
     private $ignoredUrlsPattern;
+    private $filteredRequestParams;
     private $command;
     private $commandInput;
 
@@ -72,22 +73,23 @@ class Notifier
      */
     public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $cacheDir, $config)
     {
-        $this->mailer               = $mailer;
-        $this->templating           = $templating;
-        $this->from                 = $config['from'];
-        $this->to                   = $config['to'];
-        $this->handle404            = $config['handle404'];
-        $this->handleHTTPcodes      = $config['handleHTTPcodes'];
-        $this->reportErrors         = $config['handlePHPErrors'];
-        $this->reportWarnings       = $config['handlePHPWarnings'];
-        $this->reportSilent         = $config['handleSilentErrors'];
-        $this->ignoredClasses       = $config['ignoredClasses'];
-        $this->ignoredPhpErrors     = $config['ignoredPhpErrors'];
-        $this->repeatTimeout        = $config['repeatTimeout'];
-        $this->errorsDir            = $cacheDir . '/errors';
-        $this->ignoredIPs           = $config['ignoredIPs'];
-        $this->ignoredAgentsPattern = $config['ignoredAgentsPattern'];
-        $this->ignoredUrlsPattern   = $config['ignoredUrlsPattern'];
+        $this->mailer                = $mailer;
+        $this->templating            = $templating;
+        $this->from                  = $config['from'];
+        $this->to                    = $config['to'];
+        $this->handle404             = $config['handle404'];
+        $this->handleHTTPcodes       = $config['handleHTTPcodes'];
+        $this->reportErrors          = $config['handlePHPErrors'];
+        $this->reportWarnings        = $config['handlePHPWarnings'];
+        $this->reportSilent          = $config['handleSilentErrors'];
+        $this->ignoredClasses        = $config['ignoredClasses'];
+        $this->ignoredPhpErrors      = $config['ignoredPhpErrors'];
+        $this->repeatTimeout         = $config['repeatTimeout'];
+        $this->errorsDir             = $cacheDir . '/errors';
+        $this->ignoredIPs            = $config['ignoredIPs'];
+        $this->ignoredAgentsPattern  = $config['ignoredAgentsPattern'];
+        $this->ignoredUrlsPattern    = $config['ignoredUrlsPattern'];
+        $this->filteredRequestParams = $config['filteredRequestParams'];
 
         if (!is_dir($this->errorsDir)) {
             mkdir($this->errorsDir);
@@ -330,7 +332,7 @@ class Notifier
 
         $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
             'exception'       => $exception,
-            'request'         => $request,
+            'request'         => $this->filterRequest($request),
             'status_code'     => $exception->getCode(),
             'context'         => $context,
             'command'         => $command,
@@ -359,6 +361,49 @@ class Notifier
             ->setBody($body);
 
         $this->mailer->send($mail);
+    }
+
+    /**
+     * Filter custom parameters, $_POST, $_GET and $_COOKIES. Replace properties
+     * defined in the filterList with stars.
+     *
+     * @param Request $request
+     * @return Request $request
+     */
+    private function filterRequest(Request $request)
+    {
+        if (count($this->filteredRequestParams) === 0) {
+            return $request;
+        }
+
+        $replaceWith = '*******';
+
+        foreach (['request', 'query', 'attributes', 'cookies'] as $type) {
+            foreach ($request->$type as $key => $value) {
+                // filter key => value parameters by key name
+                if (in_array($key, $this->filteredRequestParams)) {
+                    $request->$type->set($key, $replaceWith);
+                    continue;
+                }
+
+                // filter array values in parameters by key names inside the array
+                if (is_array($value)) {
+                    $found = false;
+                    foreach ($value as $valKey => $valValue) {
+                        if (in_array($valKey, $this->filteredRequestParams)) {
+                            $found = true;
+                            $value[$valKey] = $replaceWith;
+                        }
+                    }
+
+                    if ($found) {
+                        $request->$type->set($key, $value);
+                    }
+                }
+            }
+        }
+
+        return $request;
     }
 
     /**

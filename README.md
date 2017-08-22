@@ -1,9 +1,9 @@
 # Elao ErrorNotifier Bundle
 
-[![Latest Stable Version](https://poser.pugx.org/elao/error-notifier-bundle/v/stable)](https://packagist.org/packages/elao/error-notifier-bundle) 
-[![Total Downloads](https://poser.pugx.org/elao/error-notifier-bundle/downloads)](https://packagist.org/packages/elao/error-notifier-bundle) 
+[![Latest Stable Version](https://poser.pugx.org/elao/error-notifier-bundle/v/stable)](https://packagist.org/packages/elao/error-notifier-bundle)
+[![Total Downloads](https://poser.pugx.org/elao/error-notifier-bundle/downloads)](https://packagist.org/packages/elao/error-notifier-bundle)
 [![Monthly Downloads](https://poser.pugx.org/elao/error-notifier-bundle/d/monthly)](https://packagist.org/packages/elao/error-notifier-bundle)
-[![Latest Unstable Version](https://poser.pugx.org/elao/error-notifier-bundle/v/unstable)](https://packagist.org/packages/elao/error-notifier-bundle) 
+[![Latest Unstable Version](https://poser.pugx.org/elao/error-notifier-bundle/v/unstable)](https://packagist.org/packages/elao/error-notifier-bundle)
 [![License](https://poser.pugx.org/elao/error-notifier-bundle/license)](https://packagist.org/packages/elao/error-notifier-bundle)
 
 ## What is it?
@@ -74,6 +74,7 @@ elao_error_notifier:
     handlePHPErrors: true # catch fatal erros and email them
     handlePHPWarnings: true # catch warnings and email them
     handleSilentErrors: false # don't catch error on method with an @
+    filteredRequestParams: [password] # replace request contents of parameter "password" with stars
     ignoredClasses: ~
 ```
 
@@ -183,7 +184,7 @@ elao_error_notifier:
 ### How to ignore sending HTTP errors if the user agent match a given pattern?
 
 For some reasons you may need to ignore sending notifications if request comes from some user agents.
-Often you will need to use this feature with annoying crawlers which uses artificial intelligence 
+Often you will need to use this feature with annoying crawlers which uses artificial intelligence
 to generate URLs which may not exist in your site.
 
 ```yml
@@ -200,6 +201,18 @@ For example if you want to ignore all not exist images errors you may do somethi
 # app/config/config_prod.yml
 elao_error_notifier:
     ignoredUrlsPattern: "\.(jpg|png|gif)"
+```
+### How to filter sensitive data in request variables?
+
+Sometimes you don't want to receive passwords or other sensitive data via email. With `filteredRequestParams` you can specify request variable names which should be replaced with stars. This works for named forms, too (e.g. `myFormName[password]`).
+
+```yml
+# app/config/config_prod.yml
+elao_error_notifier:
+    filteredRequestParams:
+      - "password"
+      - "creditCardNo"
+      - "_token"
 ```
 
 ## Screenshot
