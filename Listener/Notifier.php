@@ -378,7 +378,7 @@ class Notifier
 
         $replaceWith = '*******';
 
-        foreach (['request', 'query', 'attributes', 'cookies'] as $type) {
+        foreach (['server', 'request', 'query', 'attributes', 'cookies'] as $type) {
             foreach ($request->$type as $key => $value) {
                 // filter key => value parameters by key name
                 if (in_array($key, $this->filteredRequestParams)) {
