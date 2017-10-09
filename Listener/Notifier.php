@@ -215,7 +215,7 @@ class Notifier
      *
      * @throws ErrorException
      */
-    public function handlePhpError($level, $message, $file, $line, $errcontext)
+    public function handlePhpError($level, $message, $file, $line, $errcontext = null)
     {
         // don't catch error with error_repoting is 0
         if (0 === error_reporting() && false === $this->reportSilent) {
