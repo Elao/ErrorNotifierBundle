@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Templating\EngineInterface;
+use Twig_Environment;
 
 /**
  * Notifier
@@ -34,9 +34,9 @@ class Notifier
     private $mailer;
 
     /**
-     * @var EngineInterface
+     * @var Twig_Environment
      */
-    private $templating;
+    private $twig;
 
     /**
      * @var string
@@ -66,15 +66,15 @@ class Notifier
     /**
      * The constructor
      *
-     * @param Swift_Mailer    $mailer     mailer
-     * @param EngineInterface $templating templating
-     * @param string          $cacheDir   cacheDir
-     * @param array           $config     configure array
+     * @param Swift_Mailer     $mailer     mailer
+     * @param Twig_Environment $twig       twig
+     * @param string           $cacheDir   cacheDir
+     * @param array            $config     configure array
      */
-    public function __construct(Swift_Mailer $mailer, EngineInterface $templating, $cacheDir, $config)
+    public function __construct(Swift_Mailer $mailer, Twig_Environment $twig, $cacheDir, $config)
     {
         $this->mailer                = $mailer;
-        $this->templating            = $templating;
+        $this->twig                  = $twig;
         $this->from                  = $config['from'];
         $this->to                    = $config['to'];
         $this->handle404             = $config['handle404'];
@@ -330,7 +330,7 @@ class Notifier
             return;
         }
 
-        $body = $this->templating->render('ElaoErrorNotifierBundle::mail.html.twig', array(
+        $body = $this->twig->render('ElaoErrorNotifierBundle::mail.html.twig', array(
             'exception'       => $exception,
             'request'         => $request ? $this->filterRequest($request): null,
             'status_code'     => $exception->getCode(),
