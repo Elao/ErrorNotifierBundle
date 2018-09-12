@@ -330,7 +330,7 @@ class Notifier
             return;
         }
 
-        $body = $this->twig->render('ElaoErrorNotifierBundle::mail.html.twig', array(
+        $body = $this->twig->render('@ElaoErrorNotifier/mail.html.twig', array(
             'exception'       => $exception,
             'request'         => $request ? $this->filterRequest($request): null,
             'status_code'     => $exception->getCode(),
