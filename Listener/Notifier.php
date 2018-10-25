@@ -339,7 +339,7 @@ class Notifier
             'command_input'   => $commandInput,
         ));
 
-        if ($this->request) {
+        if ($request) {
             $subject = '[' . $request->headers->get('host') . '] Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
         } elseif ($this->command) {
             $subject = '[' . $this->command->getName() . '] Error ' . $exception->getStatusCode() . ': ' . $exception->getMessage();
