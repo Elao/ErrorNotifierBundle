@@ -11,6 +11,8 @@ namespace Elao\ErrorNotifierBundle\Twig;
 
 use Elao\ErrorNotifierBundle\Exception\InvokerException;
 use Symfony\Component\Yaml\Dumper as YamlDumper;
+use Twig_Extension;
+use Twig_SimpleFilter;
 
 /**
  * Extends Twig with
@@ -36,7 +38,7 @@ use Symfony\Component\Yaml\Dumper as YamlDumper;
  *
  * @author Goutte
  */
-class DumpyTwigFilter extends \Twig_Extension
+class DumpyTwigFilter extends Twig_Extension
 {
     /** @const INLINE : default value for the inline parameter of the YAML dumper aka the expanding-level */
     const INLINE = 3;
@@ -51,9 +53,9 @@ class DumpyTwigFilter extends \Twig_Extension
         $optionsForRaw = array('is_safe' => array('all')); // allows raw dumping (otherwise <pre> is encoded)
 
         return array(
-            'pre'   => new \Twig_SimpleFilter('pre', array($this, 'pre'), $optionsForRaw),
-            'dump'  => new \Twig_SimpleFilter('dump', array($this, 'preDump'), $optionsForRaw),
-            'dumpy' => new \Twig_SimpleFilter('dumpy', array($this, 'preYamlDump'), $optionsForRaw),
+            'pre'   => new Twig_SimpleFilter('pre', array($this, 'pre'), $optionsForRaw),
+            'dump'  => new Twig_SimpleFilter('dump', array($this, 'preDump'), $optionsForRaw),
+            'dumpy' => new Twig_SimpleFilter('dumpy', array($this, 'preYamlDump'), $optionsForRaw),
         );
     }
 
