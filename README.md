@@ -113,7 +113,7 @@ Sometimes, you want the bundle not to send email for errors raised by a given cl
 # app/config/config_prod.yml
 elao_error_notifier:
     ignoredClasses:
-        - "Guzzle\Http\Exception\ServerErrorResponseException"
+        - "Guzzle\\Http\\Exception\\ServerErrorResponseException"
         - ...
 ```
 
