@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-04-20T17:46:36Z
+
+Hi @daum, thanks for your contribution.
+Keeping the compatibility should be easy here, right? Just keeping both methods.
+
+---------------------------------------------------------------------------
+
+by daum at 2019-04-20T18:03:23Z
+
+It's referencing a non-existent class then but we could if you prefer
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-04-23T11:19:06Z
+
+Yes, I think it's straightforward enough and doesn't justify bumping a new major version of this bundle.
+
+---------------------------------------------------------------------------
+
+by daum at 2019-05-07T14:43:30Z
+
+@ogizanagi Anything else you want done on this?
+
+---------------------------------------------------------------------------
+
+by daum at 2019-05-22T17:55:13Z
+
+@ogizanagi Did you want us to make an update for this?  At the very least I would think we should do this non-BC release as it fixes an existing bug and doesn't cause any BC breaks.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-05-27T17:43:58Z
+
+Sorry for the late answer.
+
+I stick to my [previous comments](https://github.com/Elao/ErrorNotifierBundle/pull/87#discussion_r277808548): keeping it this way is a dead-end.
+The bundle would trigger a deprecation the user can do nothing about. And the ones actually having a listener on `console.exception` performing some logic related to the bundle (or requiring to write one later) will need to change it to `console.error` to get rid of the Symfony deprecation and be able to upgrade to 4.0 anyway.
+
+Bumping the bundle to a new major version is not something that should be done blindly to me. That's something that should be planned with a roadmap and a list of changes relevant enough to justify it. It includes major rewrite of the bundle, dropping obsolete features/code paths we don't want to support anymore, ... and having a proper upgrade path for each and/or deprecations triggered. I don't think we want to maintain multiple versions without this (and if we choose to discontinue the previous major version, we'll only be leaving more people than the ones possibly concerned by this BC break).
+
+Considering this, the fact the current proposal would lead to nonsenses, the fact the BC break case is edgy, easy to fix and required to get rid of deprecations/upgrade to sf 4.0 anyway, I'd suggest to:
+- avoid the deprecation on bundle's side by using `console.error` when available
+- adding a note on the next (minor) release mentioning the BC break implied here, and how to fix it, mentioning the deprecation on [Symfony's side](https://github.com/symfony/symfony/blame/c562e71d291ec6407d0df65b5edc37d2fc0f7471/UPGRADE-3.3.md#L71-L73)
+
+It won't strictly follow semver, but it looks like the best tradeoff here to me.
+
+---------------------------------------------------------------------------
+
+by daum at 2019-05-28T12:29:50Z
+
+@ogizanagi  I understand where you are coming from with major version bumps and the hassle of maintaining two versions of the bundle, however I don't completely agree that we should throw semver out the window.  That being said, as we've agreed the edge case is fairly minimal so I've gone ahead and flipped the condition to use the `ConsoleErrorEvent` by default if it is available.  This will resolve the deprecation warnings and allow the bundle to be _mostly_ BC.
+
+Let me know if there is anything else you'd like done to get this merged.
