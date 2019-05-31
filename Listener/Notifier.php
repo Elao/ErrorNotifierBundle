@@ -14,6 +14,7 @@ use Swift_Mailer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
@@ -137,16 +138,33 @@ class Notifier
             }
         }
     }
-
+    
     /**
-     * Handle the event
+     * Handle the console exceptions (Symfony 2.3-3.4)
      *
      * @param ConsoleExceptionEvent $event event
      */
     public function onConsoleException(ConsoleExceptionEvent $event)
     {
-        $exception = $event->getException();
+        $this->handleConsoleException($event->getException());
+    }
 
+    /**
+     * Handle the console errors (Symfony 4+)
+     *
+     * @param ConsoleErrorEvent $event event
+     */
+    public function onConsoleError(ConsoleErrorEvent $event)
+    {
+        $this->handleConsoleException($event->getError());
+    }
+
+    /**
+     * Common handling logic for console exceptions
+     * @param \Throwable $exception
+     */
+    private function handleConsoleException(\Throwable $exception)
+    {
         $sendMail = !in_array(get_class($exception), $this->ignoredClasses);
 
         if ($sendMail === true) {

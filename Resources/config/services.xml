@@ -12,7 +12,6 @@
         <service id="elao.error_notifier.listener" class="%elao.error_notifier.listener.class%">
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="0"/>
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="0"/>
-            <tag name="kernel.event_listener" event="console.exception" method="onConsoleException" priority="0"/>
             <tag name="kernel.event_listener" event="console.command" method="onConsoleCommand" priority="0"/>
             <argument type="service" id="mailer" />
             <argument type="service" id="twig" />
