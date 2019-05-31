@@ -138,7 +138,7 @@ class Notifier
             }
         }
     }
-    
+
     /**
      * Handle the console exceptions (Symfony 2.3-3.4)
      *

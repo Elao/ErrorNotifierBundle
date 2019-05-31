@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-
 /**
  * ElaoErrorNotifier Extension
  */
@@ -46,11 +45,13 @@ class ElaoErrorNotifierExtension extends Extension
                 $definition->replaceArgument(0, new Reference($config['mailer']));
             }
             
-            if (true === class_exists('Symfony\Component\Console\Event\ConsoleErrorEvent')) {
-                $definition->addTag('kernel.event_listener', ['event' => 'console.error', 'method' => 'onConsoleError', 'priority' => 0]);
+            if (class_exists('Symfony\Component\Console\Event\ConsoleErrorEvent')) {
+                $listenerTag = array('event' => 'console.error', 'method' => 'onConsoleError', 'priority' => 0);
             } else {
-                $definition->addTag('kernel.event_listener', ['event' => 'console.exception', 'method' => 'onConsoleException', 'priority' => 0]);
+                $listenerTag = array('event' => 'console.exception', 'method' => 'onConsoleException', 'priority' => 0);
             }
+
+            $definition->addTag('kernel.event_listener', $listenerTag);
         }
     }
 }
